@@ -62,8 +62,18 @@ public class ClientSettingsScreen extends FadingScreen {
     private int px, py, pw, ph, cx, cw, contentTop;
 
     public ClientSettingsScreen(Screen parent) {
+        this(parent, null);
+    }
+
+    /** Opens straight onto {@code module}'s settings page (used by the HUD editor's right-click). */
+    public ClientSettingsScreen(Screen parent, Module module) {
         super(Component.literal("Client Settings"));
         this.parent = parent;
+        if (module != null) {
+            category = module.getCategory();
+            view = View.MODULE;
+            selected = module;
+        }
         search.onChange(s -> {
             if (view != View.GRID) view = View.GRID;
             rebuildContent();
@@ -141,6 +151,10 @@ public class ClientSettingsScreen extends FadingScreen {
     }
 
     private void buildGrid() {
+        if (category == Category.HUD && search.getText().isBlank()) {
+            TextButton edit = new TextButton("Edit HUD Layout", TextButton.Style.ACCENT, () -> minecraft.setScreen(new HudEditorScreen(this)));
+            chrome.add(new HeaderWidget(edit).setBounds(search.getX() - edit.preferredWidth() - Theme.GAP, py + 11, edit.preferredWidth(), 16));
+        }
         List<Module> modules = search.getText().isBlank()
                 ? ArchangelClient.modules().byCategory(category)
                 : ArchangelClient.modules().search(search.getText());

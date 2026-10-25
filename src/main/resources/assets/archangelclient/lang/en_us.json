@@ -7,5 +7,6 @@
   "archangelclient.menu.cosmetics": "Cosmetics",
   "archangelclient.menu.offline": "Offline",
   "key.archangelclient.settings": "Open Client Settings",
-  "key.category.archangelclient.main": "Archangel Client"
+  "key.category.archangelclient.main": "Archangel Client",
+  "key.archangelclient.hud_editor": "Open HUD Editor"
 }

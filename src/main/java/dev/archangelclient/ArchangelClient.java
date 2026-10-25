@@ -11,7 +11,24 @@ import dev.archangelclient.core.module.ModuleManager;
 import dev.archangelclient.gui.render.WindowIcon;
 import dev.archangelclient.gui.screen.ClientSettingsScreen;
 import dev.archangelclient.gui.theme.MenuStyleModule;
-import dev.archangelclient.hud.FpsModule;
+import dev.archangelclient.gui.screen.HudEditorScreen;
+import dev.archangelclient.hud.ClickCounter;
+import dev.archangelclient.hud.CombatTracker;
+import dev.archangelclient.hud.HudManager;
+import dev.archangelclient.hud.element.ArmorElement;
+import dev.archangelclient.hud.element.ClockElement;
+import dev.archangelclient.hud.element.ComboElement;
+import dev.archangelclient.hud.element.CoordinatesElement;
+import dev.archangelclient.hud.element.CpsElement;
+import dev.archangelclient.hud.element.FpsElement;
+import dev.archangelclient.hud.element.KeystrokesElement;
+import dev.archangelclient.hud.element.MemoryElement;
+import dev.archangelclient.hud.element.PingElement;
+import dev.archangelclient.hud.element.PotionsElement;
+import dev.archangelclient.hud.element.ReachElement;
+import dev.archangelclient.hud.element.ServerElement;
+import dev.archangelclient.hud.element.SpeedElement;
+import dev.archangelclient.hud.element.TargetHudElement;
 import dev.archangelclient.performance.UnfocusedFpsModule;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -42,7 +59,11 @@ public final class ArchangelClient implements ClientModInitializer {
     private static EventBus events;
     private static ModuleManager modules;
     private static ConfigManager config;
+    private static HudManager hud;
+    private static CombatTracker combat;
+    private static ClickCounter clicks;
     private static KeyMapping openSettingsKey;
+    private static KeyMapping openHudEditorKey;
 
     @Override
     public void onInitializeClient() {
@@ -51,7 +72,24 @@ public final class ArchangelClient implements ClientModInitializer {
         modules = new ModuleManager(events, () -> config.markDirty());
         config = new ConfigManager(modules);
 
-        modules.register(new FpsModule());
+        hud = new HudManager(modules);
+        combat = new CombatTracker(events);
+        clicks = new ClickCounter(events);
+
+        modules.register(new FpsElement());
+        modules.register(new CpsElement());
+        modules.register(new KeystrokesElement());
+        modules.register(new PingElement());
+        modules.register(new CoordinatesElement());
+        modules.register(new ArmorElement());
+        modules.register(new PotionsElement());
+        modules.register(new ClockElement());
+        modules.register(new SpeedElement());
+        modules.register(new ServerElement());
+        modules.register(new MemoryElement());
+        modules.register(new ComboElement());
+        modules.register(new ReachElement());
+        modules.register(new TargetHudElement());
         modules.register(new MenuStyleModule());
         modules.register(new UnfocusedFpsModule());
         config.init();
@@ -59,6 +97,8 @@ public final class ArchangelClient implements ClientModInitializer {
         var category = KeyMapping.Category.register(id("main"));
         openSettingsKey = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.archangelclient.settings",
                 InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, category));
+        openHudEditorKey = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.archangelclient.hud_editor",
+                InputConstants.Type.KEYSYM, InputConstants.UNKNOWN.getValue(), category));
 
         registerHooks();
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> WindowIcon.apply(client.getWindow()));
@@ -71,11 +111,17 @@ public final class ArchangelClient implements ClientModInitializer {
             while (openSettingsKey.consumeClick()) {
                 if (client.screen == null) client.setScreen(new ClientSettingsScreen(null));
             }
+            while (openHudEditorKey.consumeClick()) {
+                if (client.screen == null) client.setScreen(new HudEditorScreen(null));
+            }
             events.post(TickEvent.INSTANCE);
             config.tick();
         });
-        HudElementRegistry.addLast(id("hud"), (graphics, delta) ->
-                events.post(new Render2DEvent(graphics, delta.getGameTimeDeltaPartialTick(false))));
+        HudElementRegistry.addLast(id("hud"), (graphics, delta) -> {
+            float partialTick = delta.getGameTimeDeltaPartialTick(false);
+            hud.render(graphics, partialTick);
+            events.post(new Render2DEvent(graphics, partialTick));
+        });
         WorldRenderEvents.AFTER_ENTITIES.register(context -> events.post(new Render3DEvent(context.matrices(),
                 context.consumers(), Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false))));
         AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
@@ -91,6 +137,18 @@ public final class ArchangelClient implements ClientModInitializer {
 
     public static ModuleManager modules() {
         return modules;
+    }
+
+    public static HudManager hud() {
+        return hud;
+    }
+
+    public static CombatTracker combat() {
+        return combat;
+    }
+
+    public static ClickCounter clicks() {
+        return clicks;
     }
 
     public static ConfigManager config() {

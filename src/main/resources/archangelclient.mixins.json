@@ -6,6 +6,7 @@
   "client": [
     "FramerateLimitTrackerMixin",
     "KeyboardHandlerMixin",
+    "MouseHandlerMixin",
     "MinecraftMixin"
   ],
   "injectors": {

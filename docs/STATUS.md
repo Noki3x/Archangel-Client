@@ -1,5 +1,26 @@
 # Status
 
+## Milestone 3: done (2026-10-25)
+HUD system, HUD editor and Target HUD. Build passes; tested in a singleplayer world against a
+200 HP husk (screenshots: docs/screenshots/m3-*.png).
+
+- `hud/HudElement`: a Module with hidden x/y settings (0..1 of free space, so layouts survive
+  resizes), scale, background and text color; saved per profile. `HudManager` draws them.
+- Elements: FPS, CPS (left/right), Keystrokes (press animation, CPS on mouse buttons), Ping,
+  Coordinates + direction, Armor Status, Potion Effects, Clock, Speed, Server Address, Memory,
+  Combo, Reach Display, Target HUD.
+- `CombatTracker` (combo, reach, target, damage samples) and `ClickCounter` (CPS) only observe
+  your own vanilla attacks/clicks (`AttackEntityEvent`, `MouseClickEvent` via `MouseHandlerMixin`).
+- Target HUD: shows only after you hit an entity, only while it's alive, within 8 blocks and in
+  direct line of sight (`hasLineOfSight`), hides 1-3 s (default 2.5) after your last hit. Model
+  preview, name, distance, eased health bar red -> yellow -> green, damage graph. Verified it hides
+  when a block is placed between you and the target.
+- `HudEditorScreen`: grid, center lines, snapping to screen edges/center and other elements with
+  guide lines (hold Shift to disable), scroll to resize, arrow keys nudge, right-click opens the
+  element's settings, Reset layout. Opens from Client settings > HUD > "Edit HUD Layout" or an
+  optional keybind in vanilla Controls.
+
+
 ## Milestone 2: done (2026-10-25)
 Core systems and the Client settings screen. Build passes; tested in the running game under Xvfb
 (title screen and in a singleplayer world). Screenshots: docs/screenshots/m2-*.png.
@@ -46,4 +67,4 @@ Known gaps, scheduled for later milestones:
 `./gradlew runClient` (add `--args="--width 1700 --height 950"` for a bigger window).
 In the cloud: `Xvfb :99 &` then `DISPLAY=:99 ./gradlew runClient`.
 
-## Next: milestone 3 (HUD elements, HUD editor, Target HUD)
+## Next: milestone 4 (1.7 animations, item position, swing speed)

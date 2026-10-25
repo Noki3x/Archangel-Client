@@ -1,5 +1,19 @@
 # Status
 
+## Milestone 4: done (2026-10-25)
+Animations, all visual only (nothing changes what's sent to the server). Tested in a world
+(screenshots: docs/screenshots/m4-*.png).
+
+- `1.7 Animations` module: blockhit (hold use with a sword: old block pose, swing still plays in
+  it), old swing (no attack-cooldown dip), old eat/drink and old bow (swing shows while using),
+  "swing while using" (local-only `LivingEntity.swing(hand, false)`, no swing packet), and the
+  blocking arm pose on your own player in third person (`AvatarRendererMixin`).
+- `Custom Swing` module: swing speed 0.5-2x (`LivingEntityMixin#getCurrentSwingDuration`, your
+  own player only) and a smooth (eased) hit.
+- `Item Position` module: X/Y/Z offset, scale, X/Y/Z rotation, mirrored for the left hand.
+- Hooks live in `ItemInHandRendererMixin` (Mojang name for HeldItemRenderer).
+
+
 ## Milestone 3: done (2026-10-25)
 HUD system, HUD editor and Target HUD. Build passes; tested in a singleplayer world against a
 200 HP husk (screenshots: docs/screenshots/m3-*.png).
@@ -67,4 +81,4 @@ Known gaps, scheduled for later milestones:
 `./gradlew runClient` (add `--args="--width 1700 --height 950"` for a bigger window).
 In the cloud: `Xvfb :99 &` then `DISPLAY=:99 ./gradlew runClient`.
 
-## Next: milestone 4 (1.7 animations, item position, swing speed)
+## Next: milestone 5 (cosmetics: capes, wings, halos, aura, trails, cosmetics screen)

@@ -1,6 +1,9 @@
 package dev.archangelclient;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.archangelclient.animation.CustomSwingModule;
+import dev.archangelclient.animation.ItemPositionModule;
+import dev.archangelclient.animation.OldAnimationsModule;
 import dev.archangelclient.core.config.ConfigManager;
 import dev.archangelclient.core.event.AttackEntityEvent;
 import dev.archangelclient.core.event.EventBus;
@@ -90,6 +93,9 @@ public final class ArchangelClient implements ClientModInitializer {
         modules.register(new ComboElement());
         modules.register(new ReachElement());
         modules.register(new TargetHudElement());
+        modules.register(new OldAnimationsModule());
+        modules.register(new CustomSwingModule());
+        modules.register(new ItemPositionModule());
         modules.register(new MenuStyleModule());
         modules.register(new UnfocusedFpsModule());
         config.init();

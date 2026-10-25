@@ -29,6 +29,23 @@ public final class Theme {
     public static final int RADIUS = 6;
     public static final int RADIUS_LARGE = 10;
 
+    // Client settings screen
+    public static final int PANEL_SOLID = 0xD418191D;
+    public static final int SIDEBAR = 0x40000000;
+    public static final int CARD = 0x12FFFFFF;
+    public static final int CARD_HOVER = 0x1FFFFFFF;
+    public static final int FIELD = 0x1AFFFFFF;
+    public static final int DIVIDER = 0x14FFFFFF;
+    public static final int TOGGLE_OFF = 0x40FFFFFF;
+    public static final int DANGER = 0xFFEF4444;
+    public static final int SETTINGS_MAX_WIDTH = 520;
+    public static final int SETTINGS_MAX_HEIGHT = 300;
+    public static final int SIDEBAR_WIDTH = 112;
+    public static final int CARD_HEIGHT = 64;
+    public static final int GAP = 6;
+    public static final int ROW_HEIGHT = 28;
+    public static final long VIEW_SLIDE_MS = 220;
+
     // Glow
     public static final int GLOW_LAYERS = 6;
     public static final int GLOW_ALPHA = 0x18;

@@ -51,7 +51,7 @@ public class ArchangelTitleScreen extends FadingScreen {
         y = addMenuButton(bx, y, "multiplayer", () -> minecraft.setScreen(new JoinMultiplayerScreen(this)));
         y += Theme.MENU_GROUP_GAP;
         y = addMenuButton(bx, y, "settings", () -> minecraft.setScreen(new OptionsScreen(this, minecraft.options)));
-        y = addMenuButton(bx, y, "client", () -> minecraft.setScreen(new PlaceholderScreen(this, "Client settings")));
+        y = addMenuButton(bx, y, "client", () -> minecraft.setScreen(new ClientSettingsScreen(this)));
         y += Theme.MENU_GROUP_GAP;
         addMenuButton(bx, y, "quit", minecraft::stop);
 

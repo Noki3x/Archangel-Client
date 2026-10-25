@@ -5,5 +5,7 @@
   "archangelclient.menu.client": "Client",
   "archangelclient.menu.quit": "Quit Game",
   "archangelclient.menu.cosmetics": "Cosmetics",
-  "archangelclient.menu.offline": "Offline"
+  "archangelclient.menu.offline": "Offline",
+  "key.archangelclient.settings": "Open Client Settings",
+  "key.category.archangelclient.main": "Archangel Client"
 }

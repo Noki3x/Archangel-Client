@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "archangelclient",
+  "version": "${version}",
+  "name": "Archangel Client",
+  "description": "A legit PvP and cosmetics client: custom menus, HUD, animations, cosmetics and emotes. No cheats.",
+  "authors": ["Lucius"],
+  "license": "All-Rights-Reserved",
+  "icon": "assets/archangelclient/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["dev.archangelclient.ArchangelClient"]
+  },
+  "mixins": ["archangelclient.mixins.json"],
+  "accessWidener": "archangelclient.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.17.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "sodium": "*",
+    "iris": "*"
+  }
+}

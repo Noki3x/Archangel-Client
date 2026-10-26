@@ -72,6 +72,8 @@ Post effects (bloom, color grading, vignette) are on in these shots. Everything 
   backend, plus opacity, shadow, scale and "show own".
 - **Crosshair:** 30 custom crosshairs (including the Archangel wings) with color, opacity, size and
   outline, picked from a grid of previews.
+- **See-Through Self:** make your own skin transparent (opacity slider) and outline yourself in
+  third person. Applies to your own player only, so it reveals nothing.
 - **Visuals:** custom GLSL post effects (motion blur, bloom, color grading, vignette, chromatic
   aberration), a nebula night sky, and a brightness slider within vanilla limits. When Iris is
   installed there's a Shader Packs page.

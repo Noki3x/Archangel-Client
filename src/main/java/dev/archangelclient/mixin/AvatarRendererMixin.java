@@ -5,6 +5,7 @@ import dev.archangelclient.animation.OldAnimationsModule;
 import dev.archangelclient.cosmetics.render.CosmeticRenderData;
 import dev.archangelclient.emotes.EmotePose;
 import dev.archangelclient.nametag.Nametags;
+import dev.archangelclient.visual.SeeThroughSelfModule;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
@@ -43,6 +44,7 @@ public abstract class AvatarRendererMixin {
         if (state.nameTag != null && ArchangelClient.isReady() && avatar instanceof AbstractClientPlayer player) {
             state.nameTag = Nametags.decorate(player, state.nameTag);
         }
+        if (ArchangelClient.isReady()) ArchangelClient.modules().get(SeeThroughSelfModule.class).apply(avatar, state);
     }
 
     /** Optionally show your own nametag in third person (vanilla never draws the camera entity's). */

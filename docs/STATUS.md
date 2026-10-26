@@ -262,3 +262,10 @@ All ten milestones are done. Placeholder art to replace is listed in README.md.
   masks plus outlines, linear-filtered via `.png.mcmeta`; the wings are traced from the logo).
   `GuiMixin` wraps only the first `blitSprite` in `Gui.renderCrosshair`, so vanilla still decides
   visibility and draws the attack indicator. `CrosshairSetting` shows as a tile grid (`CrosshairGrid`).
+
+## 0.5.0
+
+- See-Through Self (`visual/SeeThroughSelfModule`): `AvatarRendererMixin` tags only the camera
+  player's render state with `SeeThroughSelfModule.OPACITY` (and, in third person, an outline color).
+  `LivingEntityRendererMixin` then uses vanilla's translucent body render type and multiplies in the
+  opacity. Other entities are never touched.

@@ -22,7 +22,8 @@
     "CachedFontProviderMixin",
     "PauseScreenMixin",
     "WingsLayerMixin",
-    "GuiMixin"
+    "GuiMixin",
+    "LivingEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

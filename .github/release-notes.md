@@ -1,13 +1,12 @@
 Archangel Client, a legit PvP and cosmetics client for **Minecraft 1.21.11** (Fabric).
 
-### New in 0.4.0
-- **Custom crosshairs.** 30 styles, including the Archangel wings, plus crosses, dots, circles, scopes, brackets, diamonds, a heart and more. Pick one from a grid of previews in Client Settings → Visuals → Crosshair.
-- **Opacity slider**, plus color, size (50–300%), a dark outline for bright backgrounds, and an option to invert colors like the vanilla crosshair. The vanilla attack indicator still shows under it.
+### New in 0.5.0
+- **See-Through Self.** Make your own skin transparent, with a skin opacity slider (10–100%), and optionally outline yourself in third person so you can see your own silhouette behind blocks. It only ever affects your own player: other players, mobs and blocks are never revealed, so it's purely cosmetic. Turn it on in Client Settings → Visuals → See-Through Self.
 
 ### Install
 1. Install Fabric Loader 0.18.4 or newer for Minecraft 1.21.11 with the [Fabric installer](https://fabricmc.net/use/installer/).
 2. Put these two jars in `.minecraft/mods`:
-   - `archangel-client-0.4.0.jar` (below). Remove any older Archangel jar.
+   - `archangel-client-0.5.0.jar` (below). Remove any older Archangel jar.
    - [Fabric API 0.141.6+1.21.11](https://modrinth.com/mod/fabric-api/version/0.141.6+1.21.11). It must be the `+1.21.11` build.
 3. Launch the fabric-loader-1.21.11 profile. Java 21 or newer.
 

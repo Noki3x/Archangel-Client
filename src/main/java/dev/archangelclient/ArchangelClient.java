@@ -42,6 +42,10 @@ import dev.archangelclient.hud.element.ServerElement;
 import dev.archangelclient.hud.element.SpeedElement;
 import dev.archangelclient.hud.element.TargetHudElement;
 import dev.archangelclient.nametag.NametagsModule;
+import dev.archangelclient.shader.PostEffectsModule;
+import dev.archangelclient.sky.NebulaSkyModule;
+import dev.archangelclient.visual.BrightnessModule;
+import dev.archangelclient.performance.FpsBoostModule;
 import dev.archangelclient.net.BackendSocket;
 import dev.archangelclient.net.ProfileCache;
 import dev.archangelclient.net.UserApi;
@@ -137,6 +141,10 @@ public final class ArchangelClient implements ClientModInitializer {
         modules.register(new CosmeticsModule());
         modules.register(new EmotesModule());
         modules.register(new NametagsModule());
+        modules.register(new PostEffectsModule());
+        modules.register(new NebulaSkyModule());
+        modules.register(new BrightnessModule());
+        modules.register(new FpsBoostModule());
         config.init();
 
         var category = KeyMapping.Category.register(id("main"));

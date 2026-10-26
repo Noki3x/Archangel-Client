@@ -38,6 +38,9 @@ public final class Theme {
     public static final int DIVIDER = 0x14FFFFFF;
     public static final int TOGGLE_OFF = 0x40FFFFFF;
     public static final int DANGER = 0xFFEF4444;
+    public static final int SUCCESS = 0xFF22C55E;
+    public static final int WARNING = 0xFFF59E0B;
+    public static final int NOTE_HEIGHT = 24;
     public static final int SETTINGS_MAX_WIDTH = 520;
     public static final int SETTINGS_MAX_HEIGHT = 300;
     public static final int SIDEBAR_WIDTH = 112;

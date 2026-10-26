@@ -96,6 +96,14 @@ public abstract class Module {
         return Collections.unmodifiableList(settings);
     }
 
+    /** Read-only status lines shown above the settings, e.g. which companion mods are installed. */
+    public List<Note> getNotes() {
+        return List.of();
+    }
+
+    /** One status line on a module page. */
+    public record Note(String title, String detail, boolean ok) {}
+
     /** Called by the module manager so state changes trigger a config auto-save. */
     void setChangeListener(Runnable listener) {
         this.changeListener = listener;

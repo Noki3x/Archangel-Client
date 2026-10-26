@@ -17,6 +17,8 @@ import dev.archangelclient.gui.widget.KeybindButton;
 import dev.archangelclient.gui.widget.ModuleCard;
 import dev.archangelclient.gui.widget.ScrollPanel;
 import dev.archangelclient.gui.widget.SettingWidget;
+import dev.archangelclient.shader.IrisBridge;
+import java.io.IOException;
 import dev.archangelclient.gui.widget.TextButton;
 import dev.archangelclient.gui.widget.TextField;
 import dev.archangelclient.gui.widget.Toggle;
@@ -44,7 +46,7 @@ public class ClientSettingsScreen extends FadingScreen {
     private static final Identifier LOGO = ArchangelClient.id("textures/gui/logo.png");
     private static final long STATUS_MS = 4000;
 
-    private enum View { GRID, MODULE, PROFILES }
+    private enum View { GRID, MODULE, PROFILES, SHADERS }
 
     private final Screen parent;
     private final List<UiWidget> chrome = new ArrayList<>();
@@ -95,13 +97,18 @@ public class ClientSettingsScreen extends FadingScreen {
         chrome.clear();
         int iy = py + 40;
         for (Category c : Category.values()) {
-            chrome.add(new SidebarItem(c.getDisplayName(), () -> view != View.PROFILES && search.getText().isEmpty() && category == c,
+            chrome.add(new SidebarItem(c.getDisplayName(), () -> (view == View.GRID || view == View.MODULE) && search.getText().isEmpty() && category == c,
                     () -> openCategory(c)).setBounds(px + 8, iy, Theme.SIDEBAR_WIDTH - 16, 17));
             iy += 19;
         }
         iy += 6;
         chrome.add(new SidebarItem("Profiles", () -> view == View.PROFILES, this::openProfiles)
                 .setBounds(px + 8, iy, Theme.SIDEBAR_WIDTH - 16, 17));
+        if (IrisBridge.isInstalled()) {
+            iy += 19;
+            chrome.add(new SidebarItem("Shader Packs", () -> view == View.SHADERS, this::openShaderPacks)
+                    .setBounds(px + 8, iy, Theme.SIDEBAR_WIDTH - 16, 17));
+        }
         chrome.add(new TextButton("Done", TextButton.Style.NORMAL, this::onClose)
                 .setBounds(px + 8, py + ph - 24, Theme.SIDEBAR_WIDTH - 16, 16));
 
@@ -131,6 +138,12 @@ public class ClientSettingsScreen extends FadingScreen {
         switchView(View.PROFILES, null);
     }
 
+    private void openShaderPacks() {
+        search.setText("");
+        search.setFocused(false);
+        switchView(View.SHADERS, null);
+    }
+
     private void switchView(View v, Module m) {
         view = v;
         selected = m;
@@ -148,6 +161,7 @@ public class ClientSettingsScreen extends FadingScreen {
             case GRID -> buildGrid();
             case MODULE -> buildModulePage();
             case PROFILES -> buildProfiles();
+            case SHADERS -> buildShaderPacks();
         }
     }
 
@@ -178,6 +192,7 @@ public class ClientSettingsScreen extends FadingScreen {
                 .setBounds(cx, py + 11, 40, 16));
         chrome.add(new HeaderWidget(new Toggle(m::isEnabled, m::toggle))
                 .setBounds(cx + cw - Toggle.WIDTH, py + 13, Toggle.WIDTH, Toggle.HEIGHT));
+        for (Module.Note note : m.getNotes()) content.add(new NoteRow(note));
         for (Setting<?> s : m.getSettings()) {
             if (s instanceof StringSetting) continue; // stored-only values, edited from their own screens
             content.add(SettingWidget.of(s));
@@ -222,6 +237,53 @@ public class ClientSettingsScreen extends FadingScreen {
                 .setBounds(2 * (third + Theme.GAP), y, third, 16);
     }
 
+    private void buildShaderPacks() {
+        List<String> packs;
+        String active;
+        try {
+            packs = IrisBridge.listPacks();
+            active = IrisBridge.activePack();
+        } catch (ReflectiveOperationException | IOException | LinkageError e) {
+            ArchangelClient.LOGGER.warn("Couldn't read Iris shader packs", e);
+            content.add(new NoteRow(new Module.Note("Couldn't read Iris's shader packs",
+                    "This Iris version isn't supported here; use Iris's own menu instead", false))).setBounds(0, 0, cw, Theme.NOTE_HEIGHT);
+            return;
+        }
+        int y = 0;
+        content.add(new ChoiceRow("Off", "Vanilla rendering with Archangel's own effects", active == null, () -> selectPack(null)))
+                .setBounds(0, y, cw, 22);
+        y += 24;
+        for (String pack : packs) {
+            content.add(new ChoiceRow(pack, null, pack.equals(active), () -> selectPack(pack))).setBounds(0, y, cw, 22);
+            y += 24;
+        }
+        if (packs.isEmpty()) {
+            content.add(new NoteRow(new Module.Note("No shader packs yet",
+                    "Drop .zip packs into the shaderpacks folder, then come back here", false))).setBounds(0, y, cw, Theme.NOTE_HEIGHT);
+            y += Theme.NOTE_HEIGHT + 2;
+        }
+        y += 6;
+        TextButton folder = content.add(new TextButton("Open shaderpacks folder", TextButton.Style.NORMAL, () -> {
+            try {
+                Util.getPlatform().openPath(IrisBridge.shaderpacksDirectory());
+            } catch (ReflectiveOperationException e) {
+                setStatus("Couldn't find the shaderpacks folder");
+            }
+        }));
+        folder.setBounds(0, y, folder.preferredWidth(), 16);
+    }
+
+    private void selectPack(String pack) {
+        try {
+            IrisBridge.select(pack);
+            setStatus(pack == null ? "Shaders turned off" : "Loaded " + pack);
+        } catch (ReflectiveOperationException | LinkageError e) {
+            ArchangelClient.LOGGER.warn("Couldn't switch Iris shader pack", e);
+            setStatus("Iris couldn't load that pack; check the log");
+        }
+        rebuildContent();
+    }
+
     private void setStatus(String message) {
         status = message;
         statusAt = Util.getMillis();
@@ -232,7 +294,10 @@ public class ClientSettingsScreen extends FadingScreen {
         int y = 0;
         for (UiWidget w : content.children()) {
             if (!w.isVisible()) continue;
-            if (w instanceof TextButton b) {
+            if (w instanceof NoteRow) {
+                w.setBounds(0, y, cw, Theme.NOTE_HEIGHT);
+                y += Theme.NOTE_HEIGHT + 2;
+            } else if (w instanceof TextButton b) {
                 b.setBounds(0, y + 8, b.preferredWidth(), 16);
                 y += 28;
             } else {
@@ -302,6 +367,11 @@ public class ClientSettingsScreen extends FadingScreen {
             case PROFILES -> {
                 Fonts.drawBold(g, "Profiles", cx, py + 10, Theme.TEXT);
                 Fonts.draw(g, "Settings are saved automatically to the active profile", cx, py + 21, Theme.TEXT_MUTED);
+            }
+            case SHADERS -> {
+                Fonts.drawBold(g, "Shader Packs", cx, py + 10, Theme.TEXT);
+                Fonts.draw(g, Fonts.trim("Loaded by Iris. Archangel's post effects and sky pause while a pack is on", cw),
+                        cx, py + 21, Theme.TEXT_MUTED);
             }
         }
     }
@@ -475,6 +545,66 @@ public class ClientSettingsScreen extends FadingScreen {
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             return inner.mouseClicked(mouseX, mouseY, button);
+        }
+    }
+
+    /** A read-only status line: a colored dot, a title and a detail line. */
+    private static final class NoteRow extends UiWidget {
+        private final Module.Note note;
+
+        NoteRow(Module.Note note) {
+            this.note = note;
+        }
+
+        @Override
+        public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+            RenderUtil.roundedRect(g, x, y, width, height, Theme.RADIUS, Theme.CARD);
+            int dot = note.ok() ? Theme.SUCCESS : Theme.WARNING;
+            RenderUtil.roundedRect(g, x + 8, y + (height - 6) / 2, 6, 6, 3, dot);
+            Fonts.draw(g, Fonts.trim(note.title(), width - 30), x + 20, y + 3, Theme.TEXT);
+            Fonts.draw(g, Fonts.trim(note.detail(), width - 30), x + 20, y + 13, Theme.TEXT_MUTED);
+        }
+    }
+
+    /** One selectable entry (a shader pack): name, optional detail, and "Active" or a Use button. */
+    private static final class ChoiceRow extends UiWidget {
+        private final String name;
+        private final String detail;
+        private final boolean active;
+        private final TextButton use;
+
+        ChoiceRow(String name, String detail, boolean active, Runnable onUse) {
+            this.name = name;
+            this.detail = detail;
+            this.active = active;
+            this.use = new TextButton("Use", TextButton.Style.ACCENT, onUse);
+        }
+
+        @Override
+        public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+            RenderUtil.roundedRect(g, x, y, width, height, Theme.RADIUS, isHovered(mouseX, mouseY) ? Theme.CARD_HOVER : Theme.CARD);
+            int textW = width - 80;
+            if (detail == null) {
+                Fonts.draw(g, Fonts.trim(name, textW), x + 9, y + 7, Theme.TEXT);
+            } else {
+                int nameW = Fonts.width(Fonts.trim(name, textW));
+                Fonts.draw(g, name, x + 9, y + 7, Theme.TEXT);
+                Fonts.draw(g, Fonts.trim(detail, textW - nameW - 8), x + 17 + nameW, y + 7, Theme.TEXT_DIM);
+            }
+            if (active) {
+                int bw = Fonts.width("Active") + 12;
+                int bx = x + width - bw - 6;
+                RenderUtil.roundedRect(g, bx, y + 4, bw, 14, 7, Colors.withAlpha(Theme.ACCENT, 0x40));
+                Fonts.drawCentered(g, "Active", bx + bw / 2, y + 7, Theme.ACCENT_LIGHT);
+            } else {
+                use.setBounds(x + width - 54, y + 3, 48, 16);
+                use.render(g, mouseX, mouseY, partialTick);
+            }
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            return !active && use.mouseClicked(mouseX, mouseY, button);
         }
     }
 

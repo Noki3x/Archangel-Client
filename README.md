@@ -75,7 +75,7 @@ Post effects (bloom, color grading, vignette) are on in these shots. Everything 
 
 ## Build
 
-You need JDK 21. Gradle downloads everything else, including Minecraft, which is never
+You need JDK 21 or newer (tested on 21 and 25). Gradle downloads everything else, including Minecraft, which is never
 committed.
 
 ```bash
@@ -93,9 +93,26 @@ The dev client signs in with an offline account, so it can't use Mojang-verified
 "Backend" below for testing those locally. On a headless Linux box, run `Xvfb :99 &` first, then
 `DISPLAY=:99 ./gradlew runClient`.
 
-To play with it normally, install [Fabric Loader](https://fabricmc.net/use/) 0.18.4+ for
-1.21.11. Then put the built jar and [Fabric API](https://modrinth.com/mod/fabric-api) in your
-`.minecraft/mods` folder. Sodium and Iris are optional and work alongside it.
+To play with it normally, see "Install in your launcher" below.
+
+## Install in your launcher
+
+Archangel is built for **Minecraft 1.21.11** only. Every jar in your mods folder has to be the
+1.21.11 build, or Fabric refuses to start with "Incompatible mods found!".
+
+1. Install Java 21 or newer (tested on 21 and 25).
+2. Run the [Fabric installer](https://fabricmc.net/use/installer/), pick Minecraft **1.21.11**
+   and Loader **0.18.4** or newer. This adds a "fabric-loader-1.21.11" profile to the launcher.
+3. Download **Fabric API 0.141.6+1.21.11**:
+   [Modrinth page](https://modrinth.com/mod/fabric-api/version/0.141.6+1.21.11) or the
+   [direct jar](https://cdn.modrinth.com/data/P7dR8mSH/versions/6qAuTtLR/fabric-api-0.141.6%2B1.21.11.jar).
+   The file name must end in `+1.21.11`. The newest build on the Fabric API page is for a newer
+   Minecraft version and won't load.
+4. Put that jar and `build/libs/archangel-client-<version>.jar` (not the `-sources` jar) in
+   `.minecraft/mods`. Remove any Fabric API jar for another Minecraft version.
+5. Start the game with the fabric-loader-1.21.11 profile.
+
+Sodium and Iris are optional and work alongside it; pick their 1.21.11 builds too.
 
 ### System properties
 

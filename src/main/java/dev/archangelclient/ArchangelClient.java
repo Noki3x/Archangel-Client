@@ -1,5 +1,6 @@
 package dev.archangelclient;
 
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.archangelclient.animation.CustomSwingModule;
 import dev.archangelclient.animation.ItemPositionModule;
@@ -15,10 +16,14 @@ import dev.archangelclient.cosmetics.CosmeticManager;
 import dev.archangelclient.cosmetics.CosmeticRegistry;
 import dev.archangelclient.cosmetics.CosmeticsModule;
 import dev.archangelclient.cosmetics.render.CosmeticLayer;
+import dev.archangelclient.emotes.EmoteManager;
+import dev.archangelclient.emotes.EmoteRegistry;
+import dev.archangelclient.emotes.EmotesModule;
 import dev.archangelclient.gui.render.WindowIcon;
 import dev.archangelclient.gui.screen.ClientSettingsScreen;
-import dev.archangelclient.gui.theme.MenuStyleModule;
+import dev.archangelclient.gui.screen.EmoteWheelScreen;
 import dev.archangelclient.gui.screen.HudEditorScreen;
+import dev.archangelclient.gui.theme.MenuStyleModule;
 import dev.archangelclient.hud.ClickCounter;
 import dev.archangelclient.hud.CombatTracker;
 import dev.archangelclient.hud.HudManager;
@@ -36,11 +41,13 @@ import dev.archangelclient.hud.element.ReachElement;
 import dev.archangelclient.hud.element.ServerElement;
 import dev.archangelclient.hud.element.SpeedElement;
 import dev.archangelclient.hud.element.TargetHudElement;
+import dev.archangelclient.net.BackendSocket;
 import dev.archangelclient.performance.UnfocusedFpsModule;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
@@ -49,8 +56,8 @@ import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.world.InteractionResult;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -74,6 +81,9 @@ public final class ArchangelClient implements ClientModInitializer {
     private static CombatTracker combat;
     private static ClickCounter clicks;
     private static CosmeticManager cosmetics;
+    private static EmoteManager emotes;
+    private static BackendSocket backend;
+    private static KeyMapping emoteWheelKey;
     private static KeyMapping openSettingsKey;
     private static KeyMapping openHudEditorKey;
 
@@ -88,6 +98,9 @@ public final class ArchangelClient implements ClientModInitializer {
         combat = new CombatTracker(events);
         clicks = new ClickCounter(events);
         cosmetics = new CosmeticManager();
+        emotes = new EmoteManager();
+        backend = new BackendSocket();
+        emotes.sync().attach(backend);
 
         modules.register(new FpsElement());
         modules.register(new CpsElement());
@@ -109,6 +122,7 @@ public final class ArchangelClient implements ClientModInitializer {
         modules.register(new MenuStyleModule());
         modules.register(new UnfocusedFpsModule());
         modules.register(new CosmeticsModule());
+        modules.register(new EmotesModule());
         config.init();
 
         var category = KeyMapping.Category.register(id("main"));
@@ -116,9 +130,12 @@ public final class ArchangelClient implements ClientModInitializer {
                 InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, category));
         openHudEditorKey = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.archangelclient.hud_editor",
                 InputConstants.Type.KEYSYM, InputConstants.UNKNOWN.getValue(), category));
+        emoteWheelKey = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.archangelclient.emote_wheel",
+                InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, category));
 
         registerHooks();
         registerCosmetics();
+        registerEmotes();
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> WindowIcon.apply(client.getWindow()));
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> config.save());
     }
@@ -131,6 +148,11 @@ public final class ArchangelClient implements ClientModInitializer {
             }
             while (openHudEditorKey.consumeClick()) {
                 if (client.screen == null) client.setScreen(new HudEditorScreen(null));
+            }
+            while (emoteWheelKey.consumeClick()) {
+                if (client.screen == null && client.player != null && modules.get(EmotesModule.class).isEnabled()) {
+                    client.setScreen(new EmoteWheelScreen(emoteWheelKey));
+                }
             }
             events.post(TickEvent.INSTANCE);
             config.tick();
@@ -159,6 +181,30 @@ public final class ArchangelClient implements ClientModInitializer {
         events.subscribe(Render3DEvent.class, e -> cosmetics.effects().render(e.poseStack(), e.submitter(), e.partialTick()));
     }
 
+    private static void registerEmotes() {
+        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(EmoteRegistry.RELOADER_ID, emotes.registry());
+        events.subscribe(TickEvent.class, e -> emotes.tick());
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            backend.connect(() -> hello(client));
+            EmoteWheelScreen.prepare(); // build the wheel's textures now, not on the first press
+        });
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            backend.disconnect();
+            emotes.clear();
+        });
+    }
+
+    /** First message on every backend connection: who you are and which server you're on (for scoping). */
+    private static JsonObject hello(Minecraft client) {
+        JsonObject m = new JsonObject();
+        m.addProperty("type", "hello");
+        m.addProperty("uuid", client.getUser().getProfileId().toString());
+        m.addProperty("name", client.getUser().getName());
+        var server = client.getCurrentServer();
+        m.addProperty("server", server != null ? server.ip : "local");
+        return m;
+    }
+
     public static EventBus events() {
         return events;
     }
@@ -181,6 +227,14 @@ public final class ArchangelClient implements ClientModInitializer {
 
     public static CosmeticManager cosmetics() {
         return cosmetics;
+    }
+
+    public static EmoteManager emotes() {
+        return emotes;
+    }
+
+    public static BackendSocket backend() {
+        return backend;
     }
 
     public static ConfigManager config() {

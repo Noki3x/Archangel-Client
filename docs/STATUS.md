@@ -1,5 +1,37 @@
 # Status
 
+## Milestone 6: done (2026-10-26)
+Emotes. Build passes; tested in a world, and sync tested with two clients on a local offline
+server through a small WebSocket relay standing in for the backend (screenshots:
+docs/screenshots/m6-*.png). Emotes are visual only: nothing is sent to the game server.
+
+- Keyframe system in `emotes/anim`: Bedrock animation JSON as exported by Blockbench / used by
+  GeckoLib (`AnimationLoader`). Per-bone rotation and position channels, `pre`/`post` jumps,
+  Bedrock `lerp_mode` (linear, catmullrom, step) and GeckoLib `easing` names (sine, quad, cubic,
+  quart, expo, back, elastic, bounce), and `loop` true / false / `hold_on_last_frame`.
+- Rig: head, body, arms, legs and a `root` bone that moves/turns the whole player around the
+  feet. Values are on the Java player rig (degrees; negative x swings an arm forward, positive z
+  lifts the right arm sideways; positions in pixels, +y up). Head keys add to where you look.
+- Poses are applied in `HumanoidModelMixin` (end of `HumanoidModel.setupAnim`), so armor, the
+  cape and Archangel cosmetics follow; the root bone is applied in `AvatarRendererMixin#scale`.
+  Emotes blend in (0.15 s) and out (0.2 s).
+- 8 emotes: wave, dab, clap, floss, sit, bow (the required six) plus salute and cheer. Sources in
+  `tools/emotes/animations.py` (writes `emotes/animations/*.animation.json`); icons drawn by
+  `tools/emotes/icons.py`. Catalog: `emotes/catalog.json` (wheel order; resource packs can add).
+- Emote wheel (`EmoteWheelScreen`): hold B (rebindable in Controls), point, release. A quick tap
+  keeps it open for clicking; 1-8 pick directly; the middle cancels. Blurred world behind it,
+  anti-aliased wedges generated at runtime (`WheelTextures`).
+- Your camera switches to third person while you emote and back afterwards. Movement keys, jump,
+  sneak or being pushed cancel the emote (also for other players: they stop when they move).
+- Sync: `net/BackendSocket` keeps a WebSocket open to `ws://<archangel.api>/v1/ws` while you are
+  in a world (retries 5 s up to 60 s, silent while offline). Protocol for milestone 9:
+  - client -> backend: `{"type":"hello","uuid","name","server"}` on connect, then
+    `{"type":"emote","emote":"wave"}` and `{"type":"emote_stop"}`.
+  - backend -> client: `{"type":"emote","uuid","emote"}` and `{"type":"emote_stop","uuid"}`.
+  - The backend should verify the uuid (Mojang session check) and only relay between players on
+    the same `server`. Clients ignore unknown emotes, players not in their world, and floods.
+- Emotes module (Emotes category): third person while emoting, show others' emotes, share mine.
+
 ## Milestone 5: done (2026-10-26)
 Cosmetics. Build passes; tested on the title screen, in the Locker and in a world by day and
 night (screenshots: docs/screenshots/m5-*.png). Everything is cosmetic and drawn with the normal
@@ -110,4 +142,4 @@ Known gaps, scheduled for later milestones:
 `./gradlew runClient` (add `--args="--width 1700 --height 950"` for a bigger window).
 In the cloud: `Xvfb :99 &` then `DISPLAY=:99 ./gradlew runClient`.
 
-## Next: milestone 6 (emotes)
+## Next: milestone 7 (custom names / nametags)

@@ -7,6 +7,7 @@
     "AvatarRendererMixin",
     "CapeLayerMixin",
     "FramerateLimitTrackerMixin",
+    "HumanoidModelMixin",
     "ItemInHandRendererMixin",
     "KeyboardHandlerMixin",
     "LivingEntityMixin",

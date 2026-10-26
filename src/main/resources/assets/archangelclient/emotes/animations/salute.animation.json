@@ -1,0 +1,71 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.archangel.salute": {
+      "loop": false,
+      "animation_length": 2.0,
+      "bones": {
+        "right_arm": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.3": {
+              "vector": [
+                -142,
+                -48,
+                0
+              ],
+              "easing": "easeOutBack"
+            },
+            "1.5": [
+              -142,
+              -48,
+              0
+            ],
+            "2": {
+              "vector": [
+                0,
+                0,
+                0
+              ],
+              "easing": "easeInOutSine"
+            }
+          }
+        },
+        "head": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.3": {
+              "vector": [
+                -6,
+                0,
+                0
+              ],
+              "easing": "easeOutSine"
+            },
+            "1.5": [
+              -6,
+              0,
+              0
+            ],
+            "2": {
+              "vector": [
+                0,
+                0,
+                0
+              ],
+              "easing": "easeInOutSine"
+            }
+          }
+        }
+      }
+    }
+  }
+}

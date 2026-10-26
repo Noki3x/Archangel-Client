@@ -3,6 +3,8 @@ package dev.archangelclient.mixin;
 import dev.archangelclient.ArchangelClient;
 import dev.archangelclient.animation.OldAnimationsModule;
 import dev.archangelclient.cosmetics.render.CosmeticRenderData;
+import dev.archangelclient.emotes.EmotePose;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -34,5 +36,16 @@ public abstract class AvatarRendererMixin {
         CosmeticRenderData data = null;
         if (ArchangelClient.isReady() && avatar instanceof AbstractClientPlayer player) data = ArchangelClient.cosmetics().dataFor(player);
         state.setData(CosmeticRenderData.KEY, data);
+        EmotePose emote = null;
+        if (ArchangelClient.isReady() && avatar instanceof AbstractClientPlayer player) emote = ArchangelClient.emotes().poseFor(player);
+        state.setData(EmotePose.KEY, emote);
+    }
+
+    /** An emote's root bone moves the whole player (and everything drawn on it) around the feet. */
+    @Inject(method = "scale(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
+            at = @At("TAIL"))
+    private void archangel$emoteRoot(AvatarRenderState state, PoseStack poseStack, CallbackInfo ci) {
+        EmotePose pose = state.getData(EmotePose.KEY);
+        if (pose != null) pose.applyRoot(poseStack);
     }
 }

@@ -1,0 +1,144 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.archangel.wave": {
+      "loop": false,
+      "animation_length": 2.4,
+      "bones": {
+        "right_arm": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.35": {
+              "vector": [
+                -12,
+                0,
+                150
+              ],
+              "easing": "easeOutBack"
+            },
+            "0.6": {
+              "vector": [
+                -12,
+                0,
+                122
+              ],
+              "easing": "easeInOutSine"
+            },
+            "0.85": {
+              "vector": [
+                -12,
+                0,
+                158
+              ],
+              "easing": "easeInOutSine"
+            },
+            "1.1": {
+              "vector": [
+                -12,
+                0,
+                122
+              ],
+              "easing": "easeInOutSine"
+            },
+            "1.35": {
+              "vector": [
+                -12,
+                0,
+                158
+              ],
+              "easing": "easeInOutSine"
+            },
+            "1.6": {
+              "vector": [
+                -12,
+                0,
+                125
+              ],
+              "easing": "easeInOutSine"
+            },
+            "1.9": {
+              "vector": [
+                -12,
+                0,
+                145
+              ],
+              "easing": "easeInOutSine"
+            },
+            "2.4": {
+              "vector": [
+                0,
+                0,
+                0
+              ],
+              "easing": "easeInOutSine"
+            }
+          }
+        },
+        "head": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.4": {
+              "vector": [
+                0,
+                0,
+                -6
+              ],
+              "easing": "easeOutSine"
+            },
+            "1.9": [
+              0,
+              0,
+              -6
+            ],
+            "2.4": {
+              "vector": [
+                0,
+                0,
+                0
+              ],
+              "easing": "easeInOutSine"
+            }
+          }
+        },
+        "body": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.4": {
+              "vector": [
+                0,
+                0,
+                -2
+              ],
+              "easing": "easeOutSine"
+            },
+            "1.9": [
+              0,
+              0,
+              -2
+            ],
+            "2.4": {
+              "vector": [
+                0,
+                0,
+                0
+              ],
+              "easing": "easeInOutSine"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "emotes": [
+    {"id": "wave", "name": "Wave", "description": "A friendly wave"},
+    {"id": "dab", "name": "Dab", "description": "Hit the dab"},
+    {"id": "clap", "name": "Clap", "description": "Applaud until you move"},
+    {"id": "floss", "name": "Floss", "description": "Swing those arms until you move"},
+    {"id": "sit", "name": "Sit", "description": "Take a seat until you move"},
+    {"id": "bow", "name": "Bow", "description": "A polite bow"},
+    {"id": "salute", "name": "Salute", "description": "A crisp salute"},
+    {"id": "cheer", "name": "Cheer", "description": "Celebrate until you move"}
+  ]
+}

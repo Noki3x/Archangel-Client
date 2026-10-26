@@ -1,0 +1,130 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.archangel.sit": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.6,
+      "bones": {
+        "root": {
+          "position": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.6": {
+              "vector": [
+                0,
+                -10,
+                0
+              ],
+              "easing": "easeOutCubic"
+            }
+          }
+        },
+        "right_leg": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.6": {
+              "vector": [
+                -86,
+                14,
+                0
+              ],
+              "easing": "easeOutCubic"
+            }
+          }
+        },
+        "left_leg": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.6": {
+              "vector": [
+                -86,
+                -14,
+                0
+              ],
+              "easing": "easeOutCubic"
+            }
+          }
+        },
+        "right_arm": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.6": {
+              "vector": [
+                -38,
+                0,
+                8
+              ],
+              "easing": "easeOutCubic"
+            }
+          }
+        },
+        "left_arm": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.6": {
+              "vector": [
+                -38,
+                0,
+                -8
+              ],
+              "easing": "easeOutCubic"
+            }
+          }
+        },
+        "body": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.6": {
+              "vector": [
+                -4,
+                0,
+                0
+              ],
+              "easing": "easeOutCubic"
+            }
+          }
+        },
+        "head": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.6": {
+              "vector": [
+                -4,
+                0,
+                0
+              ],
+              "easing": "easeOutCubic"
+            }
+          }
+        }
+      }
+    }
+  }
+}

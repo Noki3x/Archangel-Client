@@ -108,8 +108,11 @@ Archangel is built for **Minecraft 1.21.11** only. Every jar in your mods folder
    [direct jar](https://cdn.modrinth.com/data/P7dR8mSH/versions/6qAuTtLR/fabric-api-0.141.6%2B1.21.11.jar).
    The file name must end in `+1.21.11`. The newest build on the Fabric API page is for a newer
    Minecraft version and won't load.
-4. Put that jar and `build/libs/archangel-client-<version>.jar` (not the `-sources` jar) in
-   `.minecraft/mods`. Remove any Fabric API jar for another Minecraft version.
+4. Put that jar and the Archangel mod jar in `.minecraft/mods`. Remove any Fabric API jar for
+   another Minecraft version. The mod jar is `build/libs/archangel-client-<version>.jar` (not the
+   `-sources` jar). The repository's source folder or "Download ZIP" is not a mod; Fabric
+   ignores folders, so the game starts as plain Minecraft. To build the jar on Windows, open a
+   terminal in the source folder and run `gradlew.bat build`.
 5. Start the game with the fabric-loader-1.21.11 profile.
 
 Sodium and Iris are optional and work alongside it; pick their 1.21.11 builds too.

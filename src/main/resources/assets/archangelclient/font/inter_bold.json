@@ -1,6 +1,6 @@
 {
   "providers": [
-    { "type": "ttf", "file": "archangelclient:inter-semibold.ttf", "size": 9.0, "oversample": 4.0, "shift": [0, 1] },
+    { "type": "ttf", "file": "archangelclient:inter-bold.ttf", "size": 9.0, "oversample": 4.0, "shift": [0, 1] },
     { "type": "reference", "id": "minecraft:default" }
   ]
 }

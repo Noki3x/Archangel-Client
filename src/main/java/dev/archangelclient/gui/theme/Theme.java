@@ -17,6 +17,8 @@ public final class Theme {
     public static final int TEXT = 0xFFFFFFFF;
     public static final int TEXT_MUTED = 0xFF9CA0AB;
     public static final int TEXT_DIM = 0xFF5E626C;
+    /** Upper bound for the TTF raster scale; matches the largest GUI scale we expect to see. */
+    public static final int FONT_MAX_OVERSAMPLE = 8;
 
     // Accents
     public static final int ACCENT = 0xFF3B82F6;

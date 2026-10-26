@@ -17,9 +17,17 @@ public class MenuStyleModule extends Module {
     public final ColorSetting rayTint = add(new ColorSetting("Ray tint", "Color of the tinted light rays",
             Theme.BEAM_TINT, false).visibleWhen(() -> isRays()));
     public final BooleanSetting vignette = add(new BooleanSetting("Vignette", "Darken the screen edges", true));
+    public final BooleanSetting smoothFont = add(new BooleanSetting("Smooth font everywhere",
+            "Use the Archangel font in all Minecraft menus, chat and the HUD, not just client menus", true));
 
     public MenuStyleModule() {
-        super("Menu Style", "Animated light rays and vignette behind the client menus", Category.VISUALS, true);
+        super("Menu Style", "Animated light rays, vignette and font of the menus", Category.VISUALS, true);
+        smoothFont.onChange(FontSharpness::requestReload);
+    }
+
+    /** Whether vanilla text should be drawn with the Archangel font instead of the pixel font. */
+    public boolean useSmoothFontEverywhere() {
+        return isEnabled() && smoothFont.get();
     }
 
     public boolean isRays() {

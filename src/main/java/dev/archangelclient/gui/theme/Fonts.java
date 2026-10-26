@@ -21,6 +21,12 @@ public final class Fonts {
     public static final FontDescription INTER = new FontDescription.Resource(ArchangelClient.id("inter"));
     public static final FontDescription INTER_BOLD = new FontDescription.Resource(ArchangelClient.id("inter_bold"));
 
+    /** Whether vanilla's default font is currently replaced by Inter (Menu Style setting). */
+    public static boolean smoothEverywhere() {
+        var modules = ArchangelClient.modules();
+        return modules != null && modules.get(MenuStyleModule.class).useSmoothFontEverywhere();
+    }
+
     public static MutableComponent regular(String text) {
         return Component.literal(text).withStyle(Style.EMPTY.withFont(INTER));
     }

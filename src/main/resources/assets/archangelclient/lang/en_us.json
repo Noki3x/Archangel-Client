@@ -7,6 +7,7 @@
   "archangelclient.menu.cosmetics": "Cosmetics",
   "archangelclient.menu.offline": "Offline",
   "key.archangelclient.settings": "Open Client Settings",
+  "archangelclient.pause.client_settings": "Client Settings",
   "key.category.archangelclient.main": "Archangel Client",
   "key.archangelclient.hud_editor": "Open HUD Editor",
   "key.archangelclient.emote_wheel": "Emote Wheel (hold)"

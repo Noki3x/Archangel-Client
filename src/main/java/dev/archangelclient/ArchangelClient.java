@@ -21,6 +21,7 @@ import dev.archangelclient.emotes.EmoteRegistry;
 import dev.archangelclient.emotes.EmotesModule;
 import dev.archangelclient.gui.render.WindowIcon;
 import dev.archangelclient.gui.screen.ClientSettingsScreen;
+import dev.archangelclient.gui.theme.FontSharpness;
 import dev.archangelclient.gui.screen.EmoteWheelScreen;
 import dev.archangelclient.gui.screen.HudEditorScreen;
 import dev.archangelclient.gui.theme.MenuStyleModule;
@@ -179,6 +180,7 @@ public final class ArchangelClient implements ClientModInitializer {
                     client.setScreen(new EmoteWheelScreen(emoteWheelKey));
                 }
             }
+            FontSharpness.tick(client);
             events.post(TickEvent.INSTANCE);
             config.tick();
         });

@@ -234,3 +234,14 @@ In the cloud: `Xvfb :99 &` then `DISPLAY=:99 ./gradlew runClient`.
 
 ## Next
 All ten milestones are done. Placeholder art to replace is listed in README.md.
+
+## 0.2.0
+
+- Font: Inter SemiBold (regular) and Inter Bold (bold) replace Inter Medium/SemiBold.
+  `FontSharpness` rasterizes our TTF fonts at the current GUI scale (`TrueTypeGlyphProviderDefinitionMixin`)
+  and reloads just the fonts when the scale changes, so glyphs are never resampled. With Menu Style →
+  "Smooth font everywhere", `CachedFontProviderMixin` maps `minecraft:default` to Inter.
+- Pause menu: `PauseScreenMixin` adds a full-width "Client Settings" button above Disconnect.
+- Cosmetics: 22 new catalog entries. New textures and the wizard hat, horns and cat ears models come
+  from `tools/cosmetics/generate.py` (existing outputs are unchanged).
+- Releases: `.github/workflows/release.yml` builds the jar and publishes release `v<mod_version>`.

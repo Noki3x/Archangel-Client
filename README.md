@@ -56,13 +56,15 @@ Post effects (bloom, color grading, vignette) are on in these shots. Everything 
 
 - **Menus:** a custom title screen with animated light rays and a 3D preview of you in your
   cosmetics. The preview spins when idle and its head follows the cursor. There's also a client
-  settings screen (Right Shift) with search, categories and config profiles.
+  settings screen (Right Shift, or "Client Settings" in the pause menu) with search, categories
+  and config profiles. Text uses Inter SemiBold everywhere, including vanilla menus, chat and the
+  HUD, and stays sharp at every GUI scale (Visuals → Menu Style → "Smooth font everywhere").
 - **HUD:** FPS, CPS, keystrokes, ping, coordinates, armor, potions, clock, speed, server, memory,
   combo, reach display and target HUD. Open the editor from Client settings → HUD → Edit HUD
   Layout (or bind a key in Controls), then drag to move and scroll to scale, with snapping.
 - **Animations:** 1.7 animations, custom swing speed and item position.
-- **Cosmetics:** capes (including animated ones), wings, hats, halos, auras, swing trails and hit
-  effects, all chosen in the Locker.
+- **Cosmetics:** 37 of them: capes (including animated nebula, aurora and inferno capes), wings,
+  hats, halos, auras, swing trails and hit effects, all chosen in the Locker.
 - **Emotes:** hold B for the emote wheel. There are 8 Blockbench/Bedrock keyframe emotes, synced
   to other players.
 - **Nametags:** an angel-wings badge for Archangel players, display names and colors from the

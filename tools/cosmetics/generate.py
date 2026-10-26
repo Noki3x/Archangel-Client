@@ -242,6 +242,158 @@ def make_nebula_cape(frames=8):
         save(glow_full, "cape", "nebula_%d_glow.png" % i)
 
 
+def make_sakura_cape():
+    """Pale pink sky with a dark branch and drifting cherry blossoms."""
+    rng = random.Random(23)
+    fw, fh = FACE[2], FACE[3]
+    a = vertical_gradient(fw, fh, hex_rgb("#FFE4EF"), hex_rgb("#F9A8D4"))
+    border(a, 1, hex_rgb("#F472B6"), hex_rgb("#DB2777"))
+    face = Image.fromarray(a)
+    glow = Image.new("RGBA", (fw, fh), (0, 0, 0, 0))
+    fd, gd = ImageDraw.Draw(face), ImageDraw.Draw(glow)
+    # a branch reaching in from the top left
+    branch = [(0, 10), (10, 14), (18, 13), (26, 20), (33, 22)]
+    fd.line(branch, fill=hex_rgb("#4A2A35") + (255,), width=2)
+    fd.line([(10, 14), (14, 24), (13, 30)], fill=hex_rgb("#4A2A35") + (255,), width=1)
+    fd.line([(26, 20), (30, 30)], fill=hex_rgb("#4A2A35") + (255,), width=1)
+
+    def blossom(x, y, r, color):
+        for k in range(5):
+            ang = k / 5 * 2 * math.pi - math.pi / 2
+            px, py = x + math.cos(ang) * r, y + math.sin(ang) * r
+            fd.ellipse([px - r * 0.7, py - r * 0.7, px + r * 0.7, py + r * 0.7], fill=color + (255,))
+        fd.point((x, y), fill=hex_rgb("#FDE68A") + (255,))
+        gd.ellipse([x - r, y - r, x + r, y + r], fill=hex_rgb("#FBCFE8") + (150,))
+
+    for x, y in ((9, 12), (17, 11), (25, 18), (14, 25), (31, 23), (29, 29)):
+        blossom(x, y, 1.6, hex_rgb("#FFFFFF"))
+    for _ in range(14):  # falling petals
+        x, y = rng.randrange(3, fw - 3), rng.randrange(28, fh - 3)
+        c = lerp(hex_rgb("#FFFFFF"), hex_rgb("#F472B6"), rng.random() * 0.6)
+        fd.ellipse([x - 1, y, x + 1, y + 1], fill=c + (255,))
+        gd.point((x, y), fill=c + (120,))
+    inner = Image.fromarray(vertical_gradient(fw, fh, hex_rgb("#2A1720"), hex_rgb("#3B1D2C")))
+    img, glow_full = cape_canvas(face, inner, hex_rgb("#EC4899") + (255,), glow)
+    save(img, "cape", "sakura.png")
+    save(glow_full, "cape", "sakura_glow.png")
+
+
+def palette_map(f, palette):
+    """Colors a 0..1 field with a list of RGB stops."""
+    h, w = f.shape
+    a = np.zeros((h, w, 4), dtype=np.uint8)
+    idx = np.clip(f, 0, 1) * (len(palette) - 1)
+    lo = np.clip(idx.astype(int), 0, len(palette) - 2)
+    t = idx - lo
+    for c in range(3):
+        pa = np.array([p[c] for p in palette], dtype=float)
+        a[..., c] = (pa[lo] + (pa[lo + 1] - pa[lo]) * t).astype(np.uint8)
+    a[..., 3] = 255
+    return a
+
+
+def make_inferno_cape(frames=6):
+    """Animated: flames rising from the hem."""
+    fw, fh = FACE[2], FACE[3]
+    palette = [hex_rgb("#12070A"), hex_rgb("#5B0F0F"), hex_rgb("#C2410C"), hex_rgb("#F97316"), hex_rgb("#FDE68A")]
+    yy, xx = np.mgrid[0:fh, 0:fw].astype(float)
+    u, v = xx / fw, yy / fh
+    for i in range(frames):
+        phase = i / frames * 6.283
+        flick = (np.sin(u * 17 + phase + np.sin(v * 9 - phase) * 1.4) * 0.5
+                 + np.sin(u * 31 - phase * 2 + v * 5) * 0.3
+                 + np.sin(v * 23 + phase * 3) * 0.2)
+        f = np.clip(v * 1.25 - 0.35 + flick * 0.28, 0, 1) ** 1.2
+        a = palette_map(f, palette)
+        border(a, 1, hex_rgb("#F97316"), hex_rgb("#FACC15"))
+        glow = np.zeros_like(a)
+        glow[..., :3] = a[..., :3]
+        glow[..., 3] = (np.clip((f - 0.55) / 0.45, 0, 1) * 230).astype(np.uint8)
+        glow[0, :] = glow[-1, :] = (251, 146, 60, 220)
+        glow[:, 0] = glow[:, -1] = (250, 204, 21, 220)
+        inner = Image.fromarray(vertical_gradient(fw, fh, hex_rgb("#140A0A"), hex_rgb("#2A0E0A")))
+        img, glow_full = cape_canvas(Image.fromarray(a), inner, hex_rgb("#9A3412") + (255,), Image.fromarray(glow))
+        save(img, "cape", "inferno_%d.png" % i)
+        save(glow_full, "cape", "inferno_%d_glow.png" % i)
+
+
+def make_aurora_cape(frames=8):
+    """Animated: green and violet curtains of light over a starry night."""
+    rng = random.Random(31)
+    fw, fh = FACE[2], FACE[3]
+    st = stars(rng, fw - 4, fh - 4, 22)
+    yy, xx = np.mgrid[0:fh, 0:fw].astype(float)
+    u, v = xx / fw, yy / fh
+    for i in range(frames):
+        phase = i / frames * 6.283
+        base = vertical_gradient(fw, fh, hex_rgb("#050816"), hex_rgb("#0B1730")).astype(float)
+        light = np.zeros((fh, fw, 3))
+        for k, (col, off, spd) in enumerate([("#34D399", 0.0, 1.0), ("#22D3EE", 1.7, -1.3), ("#A78BFA", 3.1, 0.8)]):
+            center = 0.5 + 0.28 * np.sin(v * 5 + phase * spd + off) + 0.08 * np.sin(v * 13 - phase + k)
+            band = np.exp(-((u - center) / 0.09) ** 2) * np.clip(1.2 - v, 0, 1) * (0.6 + 0.4 * np.sin(v * 30 + phase * 2 + k))
+            light += band[..., None] * np.array(hex_rgb(col), dtype=float)
+        a = base.copy()
+        a[..., :3] = np.clip(base[..., :3] + light * 0.85, 0, 255)
+        a = a.astype(np.uint8)
+        intensity = np.clip(light.max(axis=2) / 255, 0, 1)
+        border(a, 1, hex_rgb("#34D399"), hex_rgb("#A78BFA"))
+        glow = np.zeros_like(a)
+        glow[..., :3] = a[..., :3]
+        glow[..., 3] = (np.clip((intensity - 0.3) / 0.7, 0, 1) * 210).astype(np.uint8)
+        for x, y, b in st:
+            tw = 0.5 + 0.5 * math.sin(phase * 2 + b * 17)
+            c = lerp(hex_rgb("#C7D2FE"), (255, 255, 255), tw)
+            a[y + 2, x + 2, :3] = c
+            glow[y + 2, x + 2] = c + (int(200 * tw),)
+        glow[0, :] = glow[-1, :] = (52, 211, 153, 210)
+        glow[:, 0] = glow[:, -1] = (167, 139, 250, 210)
+        inner = Image.fromarray(vertical_gradient(fw, fh, hex_rgb("#070B18"), hex_rgb("#0C1426")))
+        img, glow_full = cape_canvas(Image.fromarray(a), inner, hex_rgb("#1F5F5B") + (255,), Image.fromarray(glow))
+        save(img, "cape", "aurora_%d.png" % i)
+        save(glow_full, "cape", "aurora_%d_glow.png" % i)
+
+
+def make_frost_cape():
+    """Icy blue with a glowing six-armed snowflake."""
+    rng = random.Random(41)
+    fw, fh = FACE[2], FACE[3]
+    a = vertical_gradient(fw, fh, hex_rgb("#E0F2FE"), hex_rgb("#38BDF8"))
+    border(a, 1, hex_rgb("#FFFFFF"), hex_rgb("#7DD3FC"))
+    face = Image.fromarray(a)
+    glow = Image.new("RGBA", (fw, fh), (0, 0, 0, 0))
+    # draw the snowflake at 4x, then scale down for smooth arms
+    big = Image.new("L", (fw * 4, fh * 4), 0)
+    bd = ImageDraw.Draw(big)
+    cx, cy, r = fw * 2, fh * 1.6, fw * 1.5
+    for k in range(6):
+        ang = k / 6 * 2 * math.pi
+        ex, ey = cx + math.cos(ang) * r, cy + math.sin(ang) * r
+        bd.line([(cx, cy), (ex, ey)], fill=255, width=5)
+        for t in (0.45, 0.72):  # little side branches
+            bx, by = cx + math.cos(ang) * r * t, cy + math.sin(ang) * r * t
+            for side in (-1, 1):
+                ba = ang + side * math.radians(40)
+                bd.line([(bx, by), (bx + math.cos(ba) * r * 0.25, by + math.sin(ba) * r * 0.25)], fill=255, width=4)
+    bd.ellipse([cx - 9, cy - 9, cx + 9, cy + 9], fill=255)
+    flake = big.resize((fw, fh), Image.LANCZOS)
+    tint = Image.new("RGBA", (fw, fh), hex_rgb("#FFFFFF") + (0,))
+    tint.putalpha(flake)
+    face.alpha_composite(tint)
+    gt = Image.new("RGBA", (fw, fh), hex_rgb("#BAE6FD") + (0,))
+    gt.putalpha(flake)
+    glow.alpha_composite(gt)
+    gd = ImageDraw.Draw(glow)
+    fd = ImageDraw.Draw(face)
+    for _ in range(18):  # frost sparkles
+        x, y = rng.randrange(2, fw - 2), rng.randrange(2, fh - 2)
+        fd.point((x, y), fill=(255, 255, 255, 255))
+        gd.point((x, y), fill=(255, 255, 255, 180))
+    inner = Image.fromarray(vertical_gradient(fw, fh, hex_rgb("#0B1622"), hex_rgb("#0E2233")))
+    img, glow_full = cape_canvas(face, inner, hex_rgb("#7DD3FC") + (255,), glow)
+    save(img, "cape", "frost.png")
+    save(glow_full, "cape", "frost_glow.png")
+
+
 # ---------------------------------------------------------------- wings
 WS = 4  # wing textures are 4x the 64x64 model units
 
@@ -465,6 +617,69 @@ def make_top_hat():
     ]}])
 
 
+class BoxModel:
+    """Packs box-UV cubes into a texture as they're added, painting each one a flat color."""
+
+    def __init__(self, tw, th):
+        self.arr = np.zeros((th, tw, 4), dtype=np.uint8)
+        self.cubes = []
+        self.u = self.v = self.row_h = 0
+
+    def add(self, origin, size, side, top, shade=0.2, **extra):
+        w, h, d = size
+        rw, rh = int(math.ceil(2 * (w + d))), int(math.ceil(h + d))
+        if self.u + rw > self.arr.shape[1]:
+            self.u, self.v, self.row_h = 0, self.v + self.row_h, 0
+        paint_box(self.arr, self.u, self.v, size, side, top, shade)
+        self.cubes.append(dict({"origin": origin, "size": size, "uv": [self.u, self.v]}, **extra))
+        self.u += rw
+        self.row_h = max(self.row_h, rh)
+
+    def save(self, name):
+        save(Image.fromarray(self.arr), "hat", name + ".png")
+        h, w = self.arr.shape[:2]
+        return geometry(name, w, h, [{"name": name, "pivot": [0, 24, 0], "cubes": self.cubes}])
+
+
+def make_wizard_hat():
+    """A tall violet cone, leaning back a little, with a gold band."""
+    m = BoxModel(64, 64)
+    violet, violet_top, gold = hex_rgb("#4C1D95"), hex_rgb("#6D28D9"), hex_rgb("#F5C46B")
+    m.add([-6, 32, -6], [12, 1, 12], violet, violet_top, 0)
+    m.add([-4.5, 33, -4.5], [9, 1, 9], gold, hex_rgb("#FFE3A3"), 0)
+    m.add([-4, 34, -4], [8, 3, 8], violet, violet_top)
+    m.add([-3, 37, -2.5], [6, 3, 6], violet, violet_top)
+    m.add([-2, 40, -1.5], [4, 3, 4], violet, violet_top)
+    m.add([-1, 43, -0.5], [2, 2, 2], violet, violet_top)
+    m.add([-0.5, 45, 0.5], [1, 1, 1], gold, hex_rgb("#FFE3A3"), 0)
+    return m.save("wizard_hat")
+
+
+def make_horns():
+    """Two small curved horns, dark red fading to black at the tips."""
+    m = BoxModel(32, 32)
+    base, mid, tip = hex_rgb("#7F1D1D"), hex_rgb("#450A0A"), hex_rgb("#1C0606")
+    for side in (-1, 1):
+        x = 2 if side > 0 else -4
+        m.add([x, 32, -1], [2, 2, 2], base, hex_rgb("#991B1B"))
+        m.add([x + side * 0.5, 34, -0.75], [1.5, 2, 1.5], mid, mid)
+        m.add([x + side * 1.25 + (0.25 if side < 0 else 0), 36, -0.5], [1, 1.5, 1], tip, tip, 0)
+    return m.save("horns")
+
+
+def make_cat_ears():
+    """Soft charcoal cat ears with pink insides."""
+    m = BoxModel(32, 32)
+    fur, fur_top, pink = hex_rgb("#2B2D35"), hex_rgb("#3A3D48"), hex_rgb("#F9A8D4")
+    for side in (-1, 1):
+        x = 1 if side > 0 else -4
+        m.add([x, 32, -0.5], [3, 1, 1], fur, fur_top, 0)
+        m.add([x + 0.5, 33, -0.5], [2, 1, 1], fur, fur_top, 0)
+        m.add([x + (1.5 if side > 0 else 0.5), 34, -0.5], [1, 1, 1], fur, fur_top, 0)
+        m.add([x + 0.75, 32.25, -0.6], [1.5, 1.25, 0.1], pink, pink, 0)
+    return m.save("cat_ears")
+
+
 # ---------------------------------------------------------------- aura
 def make_aura_swirl():
     n = 64
@@ -493,6 +708,24 @@ def main():
     save_model("crown", make_crown())
     save_model("top_hat", make_top_hat())
     make_aura_swirl()
+    # added in 0.2.0
+    make_sakura_cape()
+    make_inferno_cape()
+    make_aurora_cape()
+    make_frost_cape()
+    make_wings("phoenix", hex_rgb("#FFB347"), hex_rgb("#E2502C"), hex_rgb("#FFD27A"), hex_rgb("#FF8A3D"),
+               hex_rgb("#FFD27A"), hex_rgb("#F97316"))
+    make_wings("frost", hex_rgb("#F0FDFF"), hex_rgb("#67E8F9"), hex_rgb("#FFFFFF"), hex_rgb("#A5F3FC"),
+               hex_rgb("#FFFFFF"), hex_rgb("#CFFAFE"))
+    make_wings("shadow", hex_rgb("#1A1A20"), hex_rgb("#2A0E14"), hex_rgb("#EF4444"), hex_rgb("#DC2626"),
+               hex_rgb("#111114"), hex_rgb("#1F0A0E"))
+    make_wings("sakura", hex_rgb("#FFF1F7"), hex_rgb("#F9A8D4"), hex_rgb("#EC4899"), hex_rgb("#F9A8D4"),
+               hex_rgb("#FFFFFF"), hex_rgb("#FBCFE8"))
+    make_halo("golden", hex_rgb("#FFF3C4"), hex_rgb("#F5C46B"), hex_rgb("#FCD34D"))
+    make_halo("inferno", hex_rgb("#FDBA74"), hex_rgb("#EF4444"), hex_rgb("#FB923C"))
+    save_model("wizard_hat", make_wizard_hat())
+    save_model("horns", make_horns())
+    save_model("cat_ears", make_cat_ears())
 
 
 if __name__ == "__main__":

@@ -255,3 +255,10 @@ All ten milestones are done. Placeholder art to replace is listed in README.md.
 - Elytra: cape textures now also cover the elytra UVs (`paint_elytra` in the generator).
   `CosmeticLayer` draws the elytra with the cape's current frame and glow; `WingsLayerMixin` skips
   vanilla's elytra for those players.
+
+## 0.4.0
+
+- Crosshair module (`visual/crosshair`): 30 styles from `tools/crosshair/generate.py` (64 px white
+  masks plus outlines, linear-filtered via `.png.mcmeta`; the wings are traced from the logo).
+  `GuiMixin` wraps only the first `blitSprite` in `Gui.renderCrosshair`, so vanilla still decides
+  visibility and draws the attack indicator. `CrosshairSetting` shows as a tile grid (`CrosshairGrid`).

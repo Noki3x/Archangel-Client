@@ -8,6 +8,7 @@ import dev.archangelclient.core.setting.NumberSetting;
 import dev.archangelclient.core.setting.Setting;
 import dev.archangelclient.gui.theme.Fonts;
 import dev.archangelclient.gui.theme.Theme;
+import dev.archangelclient.visual.crosshair.CrosshairSetting;
 import net.minecraft.client.gui.GuiGraphics;
 
 /**
@@ -25,6 +26,7 @@ public abstract class SettingWidget<S extends Setting<?>> extends UiWidget {
     public static SettingWidget<?> of(Setting<?> setting) {
         if (setting instanceof BooleanSetting s) return new BooleanRow(s);
         if (setting instanceof NumberSetting s) return new Slider(s);
+        if (setting instanceof CrosshairSetting s) return new CrosshairGrid(s);
         if (setting instanceof ModeSetting s) return new Dropdown(s);
         if (setting instanceof ColorSetting s) return new ColorPicker(s);
         if (setting instanceof KeybindSetting s) return new KeybindButton(s);

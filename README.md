@@ -70,6 +70,8 @@ Post effects (bloom, color grading, vignette) are on in these shots. Everything 
   to other players.
 - **Nametags:** an angel-wings badge for Archangel players, display names and colors from the
   backend, plus opacity, shadow, scale and "show own".
+- **Crosshair:** 30 custom crosshairs (including the Archangel wings) with color, opacity, size and
+  outline, picked from a grid of previews.
 - **Visuals:** custom GLSL post effects (motion blur, bloom, color grading, vignette, chromatic
   aberration), a nebula night sky, and a brightness slider within vanilla limits. When Iris is
   installed there's a Shader Packs page.

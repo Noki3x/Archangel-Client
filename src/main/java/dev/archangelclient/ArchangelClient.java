@@ -46,6 +46,7 @@ import dev.archangelclient.nametag.NametagsModule;
 import dev.archangelclient.shader.PostEffectsModule;
 import dev.archangelclient.sky.NebulaSkyModule;
 import dev.archangelclient.visual.BrightnessModule;
+import dev.archangelclient.visual.crosshair.CrosshairModule;
 import dev.archangelclient.performance.FpsBoostModule;
 import dev.archangelclient.net.BackendSession;
 import dev.archangelclient.net.BackendSocket;
@@ -148,6 +149,7 @@ public final class ArchangelClient implements ClientModInitializer {
         modules.register(new PostEffectsModule());
         modules.register(new NebulaSkyModule());
         modules.register(new BrightnessModule());
+        modules.register(new CrosshairModule());
         modules.register(new FpsBoostModule());
         config.init();
 

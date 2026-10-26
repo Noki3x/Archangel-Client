@@ -21,7 +21,7 @@ public class MenuStyleModule extends Module {
             "Use the Archangel font in all Minecraft menus, chat and the HUD, not just client menus", true));
 
     public MenuStyleModule() {
-        super("Menu Style", "Animated light rays, vignette and font of the menus", Category.VISUALS, true);
+        super("Menu Style", "Light rays, vignette and font", Category.VISUALS, true);
         smoothFont.onChange(FontSharpness::requestReload);
     }
 

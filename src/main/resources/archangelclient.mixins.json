@@ -21,7 +21,8 @@
     "TrueTypeGlyphProviderDefinitionMixin",
     "CachedFontProviderMixin",
     "PauseScreenMixin",
-    "WingsLayerMixin"
+    "WingsLayerMixin",
+    "GuiMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -126,6 +126,16 @@ public final class Theme {
     public static final int RADIAL_GLOW_STEPS = 16;
     public static final int RADIAL_GLOW_ALPHA = 0x07;
 
+    // Crosshair
+    /** Vanilla's crosshair is 15 GUI pixels; ours draw at this size at 100%. */
+    public static final int CROSSHAIR_SIZE = 15;
+    public static final int CROSSHAIR_TEXTURE_SIZE = 64;
+    public static final int CROSSHAIR_OUTLINE = 0xC0000000;
+    /** Tiles of the crosshair picker in the settings screen. */
+    public static final int CROSSHAIR_TILE = 26;
+    public static final int CROSSHAIR_TILE_GAP = 4;
+    public static final int CROSSHAIR_TILE_ICON = 16;
+
     // Light beams (fan of rays from above the top-right corner)
     public static final int BEAM_COUNT = 6;
     public static final float BEAM_ORIGIN_X = 0.85f;

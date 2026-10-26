@@ -1,5 +1,7 @@
 # Archangel Client
 
+![Seraph wings, halo and the animated Nebula cape in a cherry grove](docs/showcase/cherry-front.jpg)
+
 A legit PvP and cosmetics client for Minecraft Java 1.21.11, built as a Fabric mod (Mojang
 mappings, Java 21). It has custom menus, a HUD with an editor, 1.7-style animations, cosmetics,
 emotes, nametag badges, post effects and a nebula sky. A small backend lets Archangel players see
@@ -12,6 +14,43 @@ with normal depth testing, so nothing shows through walls. No Mojang assets or c
 redistributed; the client changes the game through mixins against the official mappings.
 
 Progress notes for each milestone, with screenshots, are in [docs/STATUS.md](docs/STATUS.md).
+
+## Gallery
+
+<table>
+  <tr>
+    <td><img src="docs/showcase/title.jpg" alt="Title screen with the 3D cosmetics preview"></td>
+    <td><img src="docs/showcase/cherry-sunrise.jpg" alt="Wings and Nebula cape at sunrise"></td>
+  </tr>
+  <tr>
+    <td align="center">Title screen with a live 3D preview of your cosmetics</td>
+    <td align="center">Seraph wings, halo and the animated Nebula cape at sunrise</td>
+  </tr>
+  <tr>
+    <td><img src="docs/showcase/nebula-night.jpg" alt="Nebula night sky with the Archangel aura"></td>
+    <td><img src="docs/showcase/aura-hud.jpg" alt="Archangel aura, nametag badge and HUD"></td>
+  </tr>
+  <tr>
+    <td align="center">The Nebula sky at night, with the Archangel aura</td>
+    <td align="center">Aura, nametag badge, and the HUD (CPS, coordinates, keystrokes, armor)</td>
+  </tr>
+  <tr>
+    <td><img src="docs/showcase/locker.jpg" alt="The Locker"></td>
+    <td><img src="docs/showcase/emote-wheel.jpg" alt="Emote wheel"></td>
+  </tr>
+  <tr>
+    <td align="center">The Locker: try on and equip cosmetics</td>
+    <td align="center">Emote wheel (hold B)</td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/showcase/multiplayer.jpg" alt="Two players seeing each other's cosmetics"></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">Two Archangel players seeing each other's cosmetics and wings badges, synced through the backend</td>
+  </tr>
+</table>
+
+Post effects (bloom, color grading, vignette) are on in these shots. Everything shown is cosmetic.
 
 ## Features
 

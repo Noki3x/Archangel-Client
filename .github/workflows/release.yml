@@ -1,7 +1,9 @@
-# Builds the mod and publishes a GitHub release when a version tag (v*) is pushed.
+# Builds the mod and publishes a GitHub release tagged v<mod_version> (from gradle.properties).
+# Run it from the Actions tab ("Run workflow"), or push a v* tag.
 name: Release
 
 on:
+  workflow_dispatch:
   push:
     tags: ["v*"]
 
@@ -25,7 +27,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         # Attach only the mod jar, not the -sources jar.
         run: |
-          gh release create "$GITHUB_REF_NAME" \
-            --title "Archangel Client $GITHUB_REF_NAME" \
+          TAG="v$(grep '^mod_version=' gradle.properties | cut -d= -f2)"
+          gh release create "$TAG" --target "$GITHUB_SHA" \
+            --title "Archangel Client $TAG" \
             --notes-file .github/release-notes.md \
             $(ls build/libs/*.jar | grep -v -- '-sources.jar$')

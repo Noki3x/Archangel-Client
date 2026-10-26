@@ -153,7 +153,7 @@ public class CosmeticsScreen extends FadingScreen {
         Fonts.drawBold(g, "Locker", px + 12, py + 12, Theme.TEXT);
         Fonts.draw(g, "Drag to rotate", px + previewW - 12 - Fonts.width("Drag to rotate"), py + 12, Theme.TEXT_DIM);
         Fonts.drawBold(g, "Cosmetics", gx, py + 10, Theme.TEXT);
-        String status = cosmetics().profiles().isOffline()
+        String status = ArchangelClient.profiles().isOffline()
                 ? "Offline mode: every cosmetic is unlocked and only you can see them"
                 : "Other Archangel players can see what you equip";
         Fonts.draw(g, Fonts.trim(status, gw), gx, py + 21, Theme.TEXT_MUTED);

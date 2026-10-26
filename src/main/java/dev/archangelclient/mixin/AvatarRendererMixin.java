@@ -4,6 +4,7 @@ import dev.archangelclient.ArchangelClient;
 import dev.archangelclient.animation.OldAnimationsModule;
 import dev.archangelclient.cosmetics.render.CosmeticRenderData;
 import dev.archangelclient.emotes.EmotePose;
+import dev.archangelclient.nametag.Nametags;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
@@ -39,6 +40,18 @@ public abstract class AvatarRendererMixin {
         EmotePose emote = null;
         if (ArchangelClient.isReady() && avatar instanceof AbstractClientPlayer player) emote = ArchangelClient.emotes().poseFor(player);
         state.setData(EmotePose.KEY, emote);
+        if (state.nameTag != null && ArchangelClient.isReady() && avatar instanceof AbstractClientPlayer player) {
+            state.nameTag = Nametags.decorate(player, state.nameTag);
+        }
+    }
+
+    /** Optionally show your own nametag in third person (vanilla never draws the camera entity's). */
+    @Inject(method = "shouldShowName(Lnet/minecraft/world/entity/Avatar;D)Z", at = @At("RETURN"), cancellable = true)
+    private void archangel$ownNametag(Avatar avatar, double distanceSq, CallbackInfoReturnable<Boolean> cir) {
+        if (!cir.getReturnValueZ() && ArchangelClient.isReady() && avatar == Minecraft.getInstance().player
+                && !avatar.isInvisible() && Nametags.showOwn()) {
+            cir.setReturnValue(true);
+        }
     }
 
     /** An emote's root bone moves the whole player (and everything drawn on it) around the feet. */

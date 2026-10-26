@@ -19,7 +19,7 @@ import net.minecraft.client.Minecraft;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The live connection to the Archangel backend ({@code ws://<api>/v1/ws}), open while you are in a
+ * The live connection to the Archangel backend ({@code ws://<api>/ws}), open while you are in a
  * world. Messages are JSON objects with a {@code "type"}; handlers run on the client thread.
  * Without a backend it retries quietly with a growing delay, and every feature works offline.
  *
@@ -27,11 +27,10 @@ import org.jspecify.annotations.Nullable;
  * talks to the game server.
  */
 public final class BackendSocket {
-    public static final String DEFAULT_URL = "http://127.0.0.1:8787";
     private static final long MIN_RETRY_MS = 5_000, MAX_RETRY_MS = 60_000;
 
     private final URI uri;
-    private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(4)).build();
+    private final HttpClient http = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).connectTimeout(Duration.ofSeconds(4)).build();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
         Thread t = new Thread(r, "Archangel backend socket");
         t.setDaemon(true);
@@ -44,9 +43,7 @@ public final class BackendSocket {
     private volatile int generation;
 
     public BackendSocket() {
-        String base = System.getProperty("archangel.api", DEFAULT_URL);
-        if (base.endsWith("/")) base = base.substring(0, base.length() - 1);
-        uri = URI.create(base.replaceFirst("^http", "ws") + "/v1/ws");
+        uri = URI.create(UserApi.baseUrl().replaceFirst("^http", "ws") + "/ws");
     }
 
     public void on(String type, Consumer<JsonObject> handler) {

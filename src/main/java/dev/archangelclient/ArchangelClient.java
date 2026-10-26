@@ -41,8 +41,12 @@ import dev.archangelclient.hud.element.ReachElement;
 import dev.archangelclient.hud.element.ServerElement;
 import dev.archangelclient.hud.element.SpeedElement;
 import dev.archangelclient.hud.element.TargetHudElement;
+import dev.archangelclient.nametag.NametagsModule;
 import dev.archangelclient.net.BackendSocket;
+import dev.archangelclient.net.ProfileCache;
+import dev.archangelclient.net.UserApi;
 import dev.archangelclient.performance.UnfocusedFpsModule;
+import java.util.UUID;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -83,6 +87,7 @@ public final class ArchangelClient implements ClientModInitializer {
     private static CosmeticManager cosmetics;
     private static EmoteManager emotes;
     private static BackendSocket backend;
+    private static ProfileCache profiles;
     private static KeyMapping emoteWheelKey;
     private static KeyMapping openSettingsKey;
     private static KeyMapping openHudEditorKey;
@@ -100,6 +105,14 @@ public final class ArchangelClient implements ClientModInitializer {
         cosmetics = new CosmeticManager();
         emotes = new EmoteManager();
         backend = new BackendSocket();
+        profiles = new ProfileCache(new UserApi());
+        backend.on("profile_update", m -> {
+            // a player changed their cosmetics or name: refetch on next sight
+            try {
+                profiles.invalidate(UUID.fromString(m.get("uuid").getAsString()));
+            } catch (RuntimeException ignored) {
+            }
+        });
         emotes.sync().attach(backend);
 
         modules.register(new FpsElement());
@@ -123,6 +136,7 @@ public final class ArchangelClient implements ClientModInitializer {
         modules.register(new UnfocusedFpsModule());
         modules.register(new CosmeticsModule());
         modules.register(new EmotesModule());
+        modules.register(new NametagsModule());
         config.init();
 
         var category = KeyMapping.Category.register(id("main"));
@@ -191,6 +205,7 @@ public final class ArchangelClient implements ClientModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             backend.disconnect();
             emotes.clear();
+            profiles.clear();
         });
     }
 
@@ -231,6 +246,10 @@ public final class ArchangelClient implements ClientModInitializer {
 
     public static EmoteManager emotes() {
         return emotes;
+    }
+
+    public static ProfileCache profiles() {
+        return profiles;
     }
 
     public static BackendSocket backend() {

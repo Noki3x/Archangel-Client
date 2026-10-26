@@ -1,5 +1,30 @@
 # Status
 
+## Milestone 7: done (2026-10-26)
+Nametags. Build passes; tested with two clients on a local offline server against a mock
+backend (screenshots: docs/screenshots/m7-*.png).
+
+- `net/UserProfile` + `net/ProfileCache`: one profile per player from `GET /users/:uuid`
+  (`{"displayName", "nameColor": "#RRGGBB", "badge", "cosmetics": {...}}`, 404 = not an
+  Archangel player), cached 5 min, non-blocking, offline backoff. Cosmetics now read from the same
+  profile (replaces the milestone 5 `/v1/cosmetics` call). A `{"type":"profile_update","uuid"}`
+  message on the socket drops a cached profile. The socket moved to `/ws`.
+- Badge: the wings logo as a bitmap-font glyph (`font/badge.json`, `textures/font/badge.png`,
+  built by `tools/nametag/badge.py`), so it rides the vanilla nametag path (background, distance,
+  sneaking) with no extra rendering. Shown for Archangel players and for yourself.
+- Custom names: display name and color from the backend. Players on a scoreboard team keep the
+  server's formatting (ranks) and only get the badge. A display name that differs from the account
+  name is always followed by the real name in gray, so nobody can pass as someone else; names are
+  limited to letters, digits, `_` and spaces.
+- Nametags module (Nametags category): badge, custom names, background opacity, text shadow,
+  show own nametag in third person, scale. Mixins: `AvatarRendererMixin` (name + own tag),
+  `NameTagStorageMixin` (opacity, scale), `NameTagFeatureRendererMixin` (shadow). Which nametags
+  are visible stays vanilla.
+- Fix: Java's HTTP client tried an HTTP/2 upgrade on plain HTTP, which servers that also host a
+  WebSocket reject; the API client and socket now use HTTP/1.1.
+- Testing on offline servers: `-Darchangel.allowOfflineUuids=true` lets version 3 UUIDs fetch
+  profiles (normally only real version 4 accounts do).
+
 ## Milestone 6: done (2026-10-26)
 Emotes. Build passes; tested in a world, and sync tested with two clients on a local offline
 server through a small WebSocket relay standing in for the backend (screenshots:
@@ -23,7 +48,7 @@ docs/screenshots/m6-*.png). Emotes are visual only: nothing is sent to the game 
   anti-aliased wedges generated at runtime (`WheelTextures`).
 - Your camera switches to third person while you emote and back afterwards. Movement keys, jump,
   sneak or being pushed cancel the emote (also for other players: they stop when they move).
-- Sync: `net/BackendSocket` keeps a WebSocket open to `ws://<archangel.api>/v1/ws` while you are
+- Sync: `net/BackendSocket` keeps a WebSocket open to `ws://<archangel.api>/ws` (was `/v1/ws` until milestone 7) while you are
   in a world (retries 5 s up to 60 s, silent while offline). Protocol for milestone 9:
   - client -> backend: `{"type":"hello","uuid","name","server"}` on connect, then
     `{"type":"emote","emote":"wave"}` and `{"type":"emote_stop"}`.
@@ -142,4 +167,4 @@ Known gaps, scheduled for later milestones:
 `./gradlew runClient` (add `--args="--width 1700 --height 950"` for a bigger window).
 In the cloud: `Xvfb :99 &` then `DISPLAY=:99 ./gradlew runClient`.
 
-## Next: milestone 7 (custom names / nametags)
+## Next: milestone 8 (shaders / visuals)

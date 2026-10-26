@@ -2,8 +2,6 @@ package dev.archangelclient.cosmetics;
 
 import dev.archangelclient.ArchangelClient;
 import dev.archangelclient.cosmetics.effect.CosmeticEffects;
-import dev.archangelclient.cosmetics.net.CosmeticProfileCache;
-import dev.archangelclient.cosmetics.net.CosmeticsApi;
 import dev.archangelclient.cosmetics.render.CosmeticRenderData;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,13 +11,12 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Decides who wears what. The local player's loadout comes from the active config profile; other
- * players' loadouts come from the backend through {@link CosmeticProfileCache}.
+ * players' loadouts come from the backend through the shared {@link dev.archangelclient.net.ProfileCache}.
  *
  * <p>Until accounts exist (milestone 9) every catalog cosmetic counts as owned.
  */
 public final class CosmeticManager {
     private final CosmeticRegistry registry = new CosmeticRegistry();
-    private final CosmeticProfileCache profiles = new CosmeticProfileCache(new CosmeticsApi());
     private final CosmeticEffects effects = new CosmeticEffects();
     private final Set<String> owned = new HashSet<>();
     private boolean ownsEverything = true;
@@ -30,10 +27,6 @@ public final class CosmeticManager {
 
     public CosmeticEffects effects() {
         return effects;
-    }
-
-    public CosmeticProfileCache profiles() {
-        return profiles;
     }
 
     public boolean isOwned(Cosmetic cosmetic) {
@@ -67,7 +60,7 @@ public final class CosmeticManager {
             loadout = module.loadout();
         } else {
             if (!module.showOthers.get()) return null;
-            loadout = profiles.get(player.getUUID());
+            loadout = ArchangelClient.profiles().get(player.getUUID()).cosmetics();
         }
         if (loadout.isEmpty()) return null;
         return new CosmeticRenderData(loadout, self, false, player.getId());

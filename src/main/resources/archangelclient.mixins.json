@@ -12,6 +12,8 @@
     "KeyboardHandlerMixin",
     "LivingEntityMixin",
     "MouseHandlerMixin",
+    "NameTagFeatureRendererMixin",
+    "NameTagStorageMixin",
     "MinecraftMixin"
   ],
   "injectors": {

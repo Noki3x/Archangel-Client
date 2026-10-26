@@ -1,0 +1,5 @@
+{
+  "providers": [
+    {"type": "bitmap", "file": "archangelclient:font/badge.png", "ascent": 7, "height": 8, "chars": ["\ue000"]}
+  ]
+}

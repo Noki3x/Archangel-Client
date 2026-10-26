@@ -35,6 +35,15 @@ public final class RenderUtil {
         }
     }
 
+    /** Round glow fading out from the center: stacked faint discs, smallest (brightest) on top. */
+    public static void radialGlow(GuiGraphics g, int cx, int cy, int radius, int color, float strength) {
+        for (int i = Theme.RADIAL_GLOW_STEPS; i >= 1; i--) {
+            int r = Math.max(1, radius * i / Theme.RADIAL_GLOW_STEPS);
+            int a = Math.round(Theme.RADIAL_GLOW_ALPHA * strength);
+            if (a > 0) roundedRect(g, cx - r, cy - r, r * 2, r * 2, r, Colors.withAlpha(color, a));
+        }
+    }
+
     /** Vertical gradient. */
     public static void gradientV(GuiGraphics g, int x1, int y1, int x2, int y2, int top, int bottom) {
         g.fillGradient(x1, y1, x2, y2, top, bottom);

@@ -30,11 +30,15 @@ public class CosmeticPreview extends UiWidget {
     private static final float DRAG_SENSITIVITY = 2.5f;
     private static final long SWING_PERIOD_MS = 1600;
     private static final long SWING_MS = 300;
+    /** Cape angle (degrees, vanilla capeLean units) at full walking speed, and its step bob. */
+    private static final float CAPE_WALK_LEAN = 40f;
+    private static final float CAPE_BOB_RATE = 0.6662f;  // same rate as the leg swing
+    private static final float CAPE_BOB_DEG = 4f;
 
     private final Supplier<PlayerSkin> skin;
     private final AvatarRenderState state = new AvatarRenderState();
     private Loadout loadout = Loadout.EMPTY;
-    private float rotation = -25f;
+    private float rotation = Theme.PREVIEW_REST_YAW;
     private float pitch = -5f;
     private float headYaw, headPitch;
     private long lastFrameMs = -1;
@@ -44,6 +48,11 @@ public class CosmeticPreview extends UiWidget {
     private boolean demoSwing;
     private int offsetX, offsetY;
     private final boolean showcase;
+    /** Set while a screen animates the player (the title intro walk); null otherwise. */
+    private Script script;
+
+    /** A pose driven by the screen instead of the user: body yaw and walk cycle. */
+    public record Script(float rotation, float walkPos, float walkSpeed) {}
 
     /** @param showcase demonstrate effects too: hold a sword and loop a swing when a trail is worn */
     public CosmeticPreview(boolean showcase) {
@@ -64,6 +73,23 @@ public class CosmeticPreview extends UiWidget {
                     .updateForTopItem(state.rightHandItemState, stack, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, null, null, 0);
             state.rightArmPose = wantsSword ? HumanoidModel.ArmPose.ITEM : HumanoidModel.ArmPose.EMPTY;
         }
+    }
+
+    /**
+     * Drives the pose from outside (null hands control back). While scripted the player doesn't spin,
+     * can't be dragged and looks straight ahead.
+     */
+    public void setScript(Script script) {
+        if (this.script != null && script == null) {
+            rotation = this.script.rotation();
+            lastDragMs = Util.getMillis(); // wait the usual idle delay before spinning
+        }
+        this.script = script;
+    }
+
+    /** Pixels per block at the current size: the same scale {@link #render} draws with. */
+    public float pixelsPerBlock() {
+        return height / 2.75f;
     }
 
     /** Screen-space shift applied to the panel this frame (the preview ignores the GUI pose). */
@@ -88,6 +114,7 @@ public class CosmeticPreview extends UiWidget {
         state.entityType = EntityType.PLAYER;
         state.ageInTicks = (now % 1_000_000L) / 50f;
         animate(now, mouseX, mouseY, x0, y0);
+        if (script != null) rotation = script.rotation();
         state.bodyRot = 180f + rotation;
         state.yRot = headYaw;
         state.xRot = headPitch;
@@ -97,7 +124,11 @@ public class CosmeticPreview extends UiWidget {
         state.eyeHeight = 1.62f;
         state.scale = 1f;
         state.isInvisible = false;
-        state.walkAnimationSpeed = 0;
+        state.walkAnimationPos = script != null ? script.walkPos() : 0;
+        state.walkAnimationSpeed = script != null ? script.walkSpeed() : 0;
+        // the cape streams back and bobs with each step while walking, like in game
+        state.capeLean = state.walkAnimationSpeed * CAPE_WALK_LEAN;
+        state.capeFlap = Mth.sin(state.walkAnimationPos * CAPE_BOB_RATE) * state.walkAnimationSpeed * CAPE_BOB_DEG;
         state.attackTime = 0;
         if (demoSwing) {
             long t = now % SWING_PERIOD_MS;
@@ -105,7 +136,7 @@ public class CosmeticPreview extends UiWidget {
         }
         state.setData(CosmeticRenderData.KEY, loadout.isEmpty() ? null : new CosmeticRenderData(loadout, true, true, -1));
 
-        float scale = height / 2.75f;
+        float scale = pixelsPerBlock();
         Quaternionf view = new Quaternionf().rotateZ(Mth.PI);
         Quaternionf tilt = new Quaternionf().rotateX(pitch * 0.4f * Mth.DEG_TO_RAD);
         view.mul(tilt);
@@ -118,6 +149,12 @@ public class CosmeticPreview extends UiWidget {
         float dt = lastFrameMs < 0 ? 0 : Math.min(0.1f, (now - lastFrameMs) / 1000f);
         lastFrameMs = now;
         long idle = now - lastDragMs - Theme.PREVIEW_IDLE_DELAY_MS;
+        if (script != null) {
+            float k = 1f - (float) Math.exp(-Theme.PREVIEW_FOLLOW_RATE * dt);
+            headYaw -= headYaw * k;  // eyes front while walking
+            headPitch -= headPitch * k;
+            return;
+        }
         if (!dragging && idle > 0) {
             float ramp = Math.min(1f, idle / (float) Theme.PREVIEW_SPIN_RAMP_MS);
             rotation = Mth.wrapDegrees(rotation + Theme.PREVIEW_SPIN_DEG_PER_SEC * ramp * dt);
@@ -137,7 +174,7 @@ public class CosmeticPreview extends UiWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button != 0 || !isHovered(mouseX, mouseY)) return false;
+        if (button != 0 || script != null || !isHovered(mouseX, mouseY)) return false;
         dragging = true;
         lastMouseX = mouseX;
         lastMouseY = mouseY;

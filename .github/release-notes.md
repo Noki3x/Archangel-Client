@@ -1,14 +1,14 @@
 Archangel Client, a legit PvP and cosmetics client for **Minecraft 1.21.11** (Fabric).
 
-### New in 0.2.0
-- **Smoother, bolder font everywhere.** Menus, chat and the HUD now use Inter SemiBold instead of the pixel font, and text is rasterized at your GUI scale so it stays sharp. You can turn this off for vanilla text in Client Settings → Visuals → Menu Style.
-- **Client Settings in the pause menu.** Open the client settings from inside a world or server.
-- **22 new cosmetics.** Capes: Sakura, Frost, Aurora (animated), Inferno (animated). Wings: Phoenix, Frost, Shadow, Sakura. Halos: Golden, Inferno. Hats: Wizard Hat, Horns, Cat Ears. Auras: Inferno, Verdant, Rose. Swing trails: Inferno, Emerald, Sakura. Hit effects: Ember, Frost and Gold sparks.
+### New in 0.3.0
+- **Startup intro.** The first time the menu opens, the Archangel wings logo appears large in the middle of the screen, then shrinks into its place as the menu fades in item by item. Click or press any key to skip it.
+- **Walk-in.** Your player then walks onto the title screen from the right, with your name above their head the whole way, and turns to face you.
+- **Elytra matches your cape.** While wearing an Archangel cape, your elytra uses the same colors, glow and animation (animated capes stay animated).
 
 ### Install
 1. Install Fabric Loader 0.18.4 or newer for Minecraft 1.21.11 with the [Fabric installer](https://fabricmc.net/use/installer/).
 2. Put these two jars in `.minecraft/mods`:
-   - `archangel-client-0.2.0.jar` (below). Remove any older Archangel jar.
+   - `archangel-client-0.3.0.jar` (below). Remove any older Archangel jar.
    - [Fabric API 0.141.6+1.21.11](https://modrinth.com/mod/fabric-api/version/0.141.6+1.21.11). It must be the `+1.21.11` build.
 3. Launch the fabric-loader-1.21.11 profile. Java 21 or newer.
 

@@ -66,6 +66,27 @@ FACE = (1 * S, 1 * S, 10 * S, 16 * S)       # x, y, w, h of the outer face
 INNER = (12 * S, 1 * S, 10 * S, 16 * S)
 
 
+# The elytra uses the same texture as the cape: a 10x20x2 box at (22, 0). Its two big faces are
+# at (24, 2) and (36, 2), with thin edges around them.
+ELYTRA_FACE_W, ELYTRA_FACE_H = 10 * S, 20 * S
+ELYTRA_FACES = ((24 * S, 2 * S), (36 * S, 2 * S))
+
+
+def paint_elytra(img, glow, face, edge, glow_face=None):
+    """Stretches the cape's outer face over both elytra wings, so the elytra matches the cape."""
+    d = ImageDraw.Draw(img)
+    d.rectangle([24 * S, 0, 44 * S - 1, 2 * S - 1], fill=edge)        # top and bottom
+    d.rectangle([22 * S, 2 * S, 24 * S - 1, 22 * S - 1], fill=edge)   # inner edge
+    d.rectangle([34 * S, 2 * S, 36 * S - 1, 22 * S - 1], fill=edge)   # outer edge
+    wing = face.resize((ELYTRA_FACE_W, ELYTRA_FACE_H), Image.LANCZOS)
+    img.paste(wing, ELYTRA_FACES[0])
+    img.paste(wing.transpose(Image.FLIP_LEFT_RIGHT), ELYTRA_FACES[1])
+    if glow_face is not None:
+        g = glow_face.resize((ELYTRA_FACE_W, ELYTRA_FACE_H), Image.LANCZOS)
+        glow.paste(g, ELYTRA_FACES[0])
+        glow.paste(g.transpose(Image.FLIP_LEFT_RIGHT), ELYTRA_FACES[1])
+
+
 def cape_canvas(face, inner, edge, glow_face=None):
     img = Image.new("RGBA", (CAPE_W, CAPE_H), (0, 0, 0, 0))
     glow = Image.new("RGBA", (CAPE_W, CAPE_H), (0, 0, 0, 0))
@@ -79,6 +100,7 @@ def cape_canvas(face, inner, edge, glow_face=None):
     img.paste(inner, INNER[:2])
     if glow_face is not None:
         glow.paste(glow_face, FACE[:2])
+    paint_elytra(img, glow, face, edge, glow_face)
     return img, glow
 
 

@@ -17,6 +17,7 @@ import dev.archangelclient.gui.render.Colors;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.model.object.equipment.ElytraModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerCapeModel;
@@ -50,11 +51,28 @@ public class CosmeticLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
     private static final float[] SHELL_SCALES = {1.06f, 1.12f, 1.19f};
     private static final float[] SHELL_ALPHA = {0.2f, 0.13f, 0.07f};
 
+    /** Vanilla's elytra offset from the body (WingsLayer). */
+    private static final float ELYTRA_Z = 0.125f;
+
     private final PlayerCapeModel capeModel;
+    private final ElytraModel elytraModel;
+    private final ElytraModel elytraBabyModel;
 
     public CosmeticLayer(RenderLayerParent<AvatarRenderState, PlayerModel> parent, EntityModelSet models) {
         super(parent);
         this.capeModel = new PlayerCapeModel(models.bakeLayer(ModelLayers.PLAYER_CAPE));
+        this.elytraModel = new ElytraModel(models.bakeLayer(ModelLayers.ELYTRA));
+        this.elytraBabyModel = new ElytraModel(models.bakeLayer(ModelLayers.ELYTRA_BABY));
+    }
+
+    /**
+     * Whether this layer draws the elytra itself, in the colors of the equipped cape (vanilla's
+     * WingsLayer skips the player then, see {@code WingsLayerMixin}).
+     */
+    public static boolean drawsElytra(AvatarRenderState state) {
+        CosmeticRenderData data = state.getData(CosmeticRenderData.KEY);
+        return data != null && state.showCape && wearsGlider(state) && ArchangelClient.isReady()
+                && ArchangelClient.cosmetics().registry().get(data.loadout().get(CosmeticType.CAPE)) != null;
     }
 
     @Override
@@ -65,7 +83,10 @@ public class CosmeticLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
         Loadout loadout = data.loadout();
 
         Cosmetic cape = registry.get(loadout.get(CosmeticType.CAPE));
-        if (cape != null) submitCape(pose, out, light, state, cape);
+        if (cape != null) {
+            submitCape(pose, out, light, state, cape);
+            if (drawsElytra(state)) submitElytra(pose, out, light, state, cape);
+        }
         for (CosmeticType type : new CosmeticType[] {CosmeticType.WINGS, CosmeticType.HAT, CosmeticType.HALO}) {
             Cosmetic c = registry.get(loadout.get(type));
             if (c != null && c.model() != null) submitModelCosmetic(pose, out, light, state, c);
@@ -81,6 +102,25 @@ public class CosmeticLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
     }
 
     // --- capes
+
+    /** The elytra, textured with the cape's current frame (the cape textures carry elytra UVs too). */
+    private void submitElytra(PoseStack pose, SubmitNodeCollector out, int light, AvatarRenderState state, Cosmetic cape) {
+        Identifier texture = cape.texture(state.ageInTicks);
+        if (texture == null) return;
+        ElytraModel model = state.isBaby ? elytraBabyModel : elytraModel;
+        pose.pushPose();
+        pose.translate(0.0F, 0.0F, ELYTRA_Z);
+        out.submitModel(model, state, pose, RenderTypes.armorCutoutNoCull(texture), light, OverlayTexture.NO_OVERLAY,
+                -1, null, state.outlineColor, null);
+        Identifier glow = cape.glowTexture(state.ageInTicks);
+        if (glow != null) {
+            out.submitModel(model, state, pose, RenderTypes.eyes(glow), light, OverlayTexture.NO_OVERLAY, -1, null, 0, null);
+        }
+        if (state.chestEquipment.hasFoil()) {
+            out.submitModel(model, state, pose, RenderTypes.armorEntityGlint(), light, OverlayTexture.NO_OVERLAY, -1, null, 0, null);
+        }
+        pose.popPose();
+    }
 
     private void submitCape(PoseStack pose, SubmitNodeCollector out, int light, AvatarRenderState state, Cosmetic cape) {
         if (!state.showCape || wearsGlider(state)) return;

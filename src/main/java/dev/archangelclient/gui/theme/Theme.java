@@ -76,6 +76,8 @@ public final class Theme {
     public static final float PREVIEW_COLUMN_X = 0.75f;
 
     // 3D player preview (title screen, Locker)
+    /** Starting body yaw: turned a little so the cape and wings show. */
+    public static final float PREVIEW_REST_YAW = -25f;
     /** Idle spin starts this long after the last drag. */
     public static final long PREVIEW_IDLE_DELAY_MS = 2500;
     public static final float PREVIEW_SPIN_DEG_PER_SEC = 18f;
@@ -88,6 +90,41 @@ public final class Theme {
     public static final float PREVIEW_FOLLOW_RANGE = 60f;
     /** Head smoothing rate (per second): higher snaps faster to the cursor. */
     public static final float PREVIEW_FOLLOW_RATE = 8f;
+
+    // Startup intro (first title screen of a session). Times in ms from when the menu first opens.
+    /** The big centered logo fades and scales in over this long... */
+    public static final long INTRO_LOGO_IN_MS = 650;
+    /** ...holds... */
+    public static final long INTRO_LOGO_HOLD_MS = 550;
+    /** ...then shrinks and glides to its place in the menu. */
+    public static final long INTRO_LOGO_MOVE_MS = 900;
+    /** Big logo size as a fraction of the shorter screen side. */
+    public static final float INTRO_LOGO_FRACTION = 0.42f;
+    /** Starting scale of the big logo as it fades in. */
+    public static final float INTRO_LOGO_START_SCALE = 0.82f;
+    /** Menu items fade in one after another once the logo starts moving. */
+    public static final long INTRO_ITEMS_DELAY_MS = 350;
+    public static final long INTRO_ITEM_STAGGER_MS = 80;
+    public static final long INTRO_ITEM_FADE_MS = 420;
+    /** Each menu item rises this far (GUI pixels) as it fades in. */
+    public static final int INTRO_ITEM_RISE = 6;
+    /** The player starts walking in this long after the logo settles. */
+    public static final long INTRO_WALK_DELAY_MS = 150;
+    public static final long INTRO_WALK_MS = 1500;
+    /** Then turns from walking sideways to face the viewer. */
+    public static final long INTRO_TURN_MS = 500;
+    /** Body yaw while walking in from the right (degrees, preview convention). */
+    public static final float INTRO_WALK_YAW = 90f;
+    /** Limb swing per block walked, matching an entity walking normally. */
+    public static final float INTRO_WALK_CYCLE_PER_BLOCK = 4f;
+    public static final float INTRO_WALK_SPEED = 0.85f;
+    /** Soft halo behind the big logo. */
+    public static final int INTRO_LOGO_GLOW = 0xFF3B82F6;
+    /** Halo radius relative to the logo size. */
+    public static final float INTRO_LOGO_GLOW_RADIUS = 0.75f;
+    /** Radial glows: number of stacked discs, and each disc's alpha at full strength. */
+    public static final int RADIAL_GLOW_STEPS = 16;
+    public static final int RADIAL_GLOW_ALPHA = 0x07;
 
     // Light beams (fan of rays from above the top-right corner)
     public static final int BEAM_COUNT = 6;

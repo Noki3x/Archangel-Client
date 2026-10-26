@@ -20,7 +20,8 @@
     "MinecraftMixin",
     "TrueTypeGlyphProviderDefinitionMixin",
     "CachedFontProviderMixin",
-    "PauseScreenMixin"
+    "PauseScreenMixin",
+    "WingsLayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

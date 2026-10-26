@@ -245,3 +245,13 @@ All ten milestones are done. Placeholder art to replace is listed in README.md.
 - Cosmetics: 22 new catalog entries. New textures and the wizard hat, horns and cat ears models come
   from `tools/cosmetics/generate.py` (existing outputs are unchanged).
 - Releases: `.github/workflows/release.yml` builds the jar and publishes release `v<mod_version>`.
+
+## 0.3.0
+
+- Title intro (`ArchangelTitleScreen`): once per session, after the loading overlay clears, the logo
+  grows in at the center, glides to its menu spot, menu items fade in staggered, then the player
+  walks in from the right (`CosmeticPreview.Script` drives yaw and the walk cycle) and turns to face
+  the viewer. Timings are `Theme.INTRO_*`. Any click or key skips.
+- Elytra: cape textures now also cover the elytra UVs (`paint_elytra` in the generator).
+  `CosmeticLayer` draws the elytra with the cape's current frame and glow; `WingsLayerMixin` skips
+  vanilla's elytra for those players.

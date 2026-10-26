@@ -2,14 +2,18 @@ package dev.archangelclient.mixin;
 
 import dev.archangelclient.ArchangelClient;
 import dev.archangelclient.animation.OldAnimationsModule;
+import dev.archangelclient.cosmetics.render.CosmeticRenderData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.HumanoidArm;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AvatarRenderer.class)
@@ -21,5 +25,14 @@ public abstract class AvatarRendererMixin {
         if (!ArchangelClient.isReady() || avatar != Minecraft.getInstance().player || arm != avatar.getMainArm()) return;
         OldAnimationsModule anim = ArchangelClient.modules().get(OldAnimationsModule.class);
         if (anim.thirdPerson.get() && anim.isBlockhitting()) cir.setReturnValue(HumanoidModel.ArmPose.BLOCK);
+    }
+
+    /** Tags each player's render state with what they have equipped, for {@code CosmeticLayer}. */
+    @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/Avatar;Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;F)V",
+            at = @At("TAIL"))
+    private void archangel$cosmetics(Avatar avatar, AvatarRenderState state, float partialTick, CallbackInfo ci) {
+        CosmeticRenderData data = null;
+        if (ArchangelClient.isReady() && avatar instanceof AbstractClientPlayer player) data = ArchangelClient.cosmetics().dataFor(player);
+        state.setData(CosmeticRenderData.KEY, data);
     }
 }

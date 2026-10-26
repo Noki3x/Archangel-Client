@@ -6,14 +6,14 @@ import dev.archangelclient.gui.render.MenuBackground;
 import dev.archangelclient.gui.render.RenderUtil;
 import dev.archangelclient.gui.theme.Fonts;
 import dev.archangelclient.gui.theme.Theme;
-import dev.archangelclient.gui.widget.PlayerPreview;
+import dev.archangelclient.gui.widget.CosmeticPreview;
 import dev.archangelclient.gui.widget.RoundedButton;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.PlayerSkinWidget;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -22,14 +22,15 @@ import net.minecraft.resources.Identifier;
 
 /**
  * Replacement main menu (reference photo 1): wings logo and "Archangel Client" above a column of
- * minimal text buttons, a 3D preview of the player's skin on the right, and an animated backdrop.
+ * minimal text buttons, a 3D preview of the player wearing their cosmetics on the right, and an
+ * animated backdrop.
  */
 public class ArchangelTitleScreen extends FadingScreen {
     private static final Identifier LOGO = ArchangelClient.id("textures/gui/logo.png");
     private static final int LOGO_TEXTURE_SIZE = 1024;
 
     private final List<RoundedButton> menuButtons = new ArrayList<>();
-    private PlayerSkinWidget preview;
+    private CosmeticPreview preview;
     private int logoSize = Theme.LOGO_SIZE;
 
     public ArchangelTitleScreen() {
@@ -55,19 +56,18 @@ public class ArchangelTitleScreen extends FadingScreen {
         y += Theme.MENU_GROUP_GAP;
         addMenuButton(bx, y, "quit", minecraft::stop);
 
-        // Right column: live skin preview
+        // Right column: live preview of the player and their equipped cosmetics
         int px = (int) (width * Theme.PREVIEW_COLUMN_X) - Theme.PREVIEW_WIDTH / 2;
         int py = (height - Theme.PREVIEW_HEIGHT) / 2 + font.lineHeight;
-        preview = PlayerPreview.create(Theme.PREVIEW_WIDTH, Theme.PREVIEW_HEIGHT);
-        preview.setPosition(px, py);
-        addRenderableWidget(preview);
+        preview = new CosmeticPreview(false);
+        preview.setBounds(px, py, Theme.PREVIEW_WIDTH, Theme.PREVIEW_HEIGHT);
 
         // Bottom-right: cosmetics / account
         Component cosmetics = Component.translatable("archangelclient.menu.cosmetics");
         int cw = font.width(Fonts.regular(cosmetics)) + 16;
         var cosmeticsButton = new RoundedButton(width - cw - Theme.CORNER_MARGIN,
                 height - Theme.MENU_BUTTON_HEIGHT - Theme.CORNER_MARGIN, cw, Theme.MENU_BUTTON_HEIGHT, cosmetics,
-                b -> minecraft.setScreen(new PlaceholderScreen(this, "Cosmetics")));
+                b -> minecraft.setScreen(new CosmeticsScreen(this)));
         menuButtons.add(cosmeticsButton);
         addRenderableWidget(cosmeticsButton);
     }
@@ -100,6 +100,8 @@ public class ArchangelTitleScreen extends FadingScreen {
         float alpha = fade();
         menuButtons.forEach(b -> b.setAlpha(alpha));
         super.render(g, mouseX, mouseY, partialTick); // background + widgets
+        preview.setLoadout(ArchangelClient.cosmetics().localLoadout());
+        preview.render(g, mouseX, mouseY, partialTick);
 
         // Logo and title
         int cx = (int) (width * Theme.MENU_COLUMN_X);
@@ -125,6 +127,21 @@ public class ArchangelTitleScreen extends FadingScreen {
     private static String modVersion() {
         return net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer(ArchangelClient.MOD_ID)
                 .map(c -> c.getMetadata().getVersion().getFriendlyString()).orElse("dev");
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        return super.mouseClicked(event, doubleClick) || preview.mouseClicked(event.x(), event.y(), event.button());
+    }
+
+    @Override
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+        return preview.mouseDragged(event.x(), event.y(), event.button()) || super.mouseDragged(event, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        return preview.mouseReleased(event.x(), event.y(), event.button()) || super.mouseReleased(event);
     }
 
     @Override

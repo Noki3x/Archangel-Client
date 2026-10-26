@@ -1,0 +1,80 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.archangel.top_hat",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 4,
+        "visible_bounds_height": 4,
+        "visible_bounds_offset": [
+          0,
+          1.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "top_hat",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -6,
+                32,
+                -6
+              ],
+              "size": [
+                12,
+                1,
+                12
+              ],
+              "uv": [
+                0,
+                0
+              ]
+            },
+            {
+              "origin": [
+                -4,
+                33,
+                -4
+              ],
+              "size": [
+                8,
+                8,
+                8
+              ],
+              "uv": [
+                0,
+                16
+              ]
+            },
+            {
+              "origin": [
+                -4,
+                33.5,
+                -4
+              ],
+              "size": [
+                8,
+                1,
+                8
+              ],
+              "uv": [
+                0,
+                40
+              ],
+              "inflate": 0.25
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

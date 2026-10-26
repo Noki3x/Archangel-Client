@@ -11,6 +11,10 @@ import dev.archangelclient.core.event.Render2DEvent;
 import dev.archangelclient.core.event.Render3DEvent;
 import dev.archangelclient.core.event.TickEvent;
 import dev.archangelclient.core.module.ModuleManager;
+import dev.archangelclient.cosmetics.CosmeticManager;
+import dev.archangelclient.cosmetics.CosmeticRegistry;
+import dev.archangelclient.cosmetics.CosmeticsModule;
+import dev.archangelclient.cosmetics.render.CosmeticLayer;
 import dev.archangelclient.gui.render.WindowIcon;
 import dev.archangelclient.gui.screen.ClientSettingsScreen;
 import dev.archangelclient.gui.theme.MenuStyleModule;
@@ -37,11 +41,15 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionResult;
 import org.lwjgl.glfw.GLFW;
@@ -65,6 +73,7 @@ public final class ArchangelClient implements ClientModInitializer {
     private static HudManager hud;
     private static CombatTracker combat;
     private static ClickCounter clicks;
+    private static CosmeticManager cosmetics;
     private static KeyMapping openSettingsKey;
     private static KeyMapping openHudEditorKey;
 
@@ -78,6 +87,7 @@ public final class ArchangelClient implements ClientModInitializer {
         hud = new HudManager(modules);
         combat = new CombatTracker(events);
         clicks = new ClickCounter(events);
+        cosmetics = new CosmeticManager();
 
         modules.register(new FpsElement());
         modules.register(new CpsElement());
@@ -98,6 +108,7 @@ public final class ArchangelClient implements ClientModInitializer {
         modules.register(new ItemPositionModule());
         modules.register(new MenuStyleModule());
         modules.register(new UnfocusedFpsModule());
+        modules.register(new CosmeticsModule());
         config.init();
 
         var category = KeyMapping.Category.register(id("main"));
@@ -107,6 +118,7 @@ public final class ArchangelClient implements ClientModInitializer {
                 InputConstants.Type.KEYSYM, InputConstants.UNKNOWN.getValue(), category));
 
         registerHooks();
+        registerCosmetics();
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> WindowIcon.apply(client.getWindow()));
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> config.save());
     }
@@ -128,13 +140,23 @@ public final class ArchangelClient implements ClientModInitializer {
             hud.render(graphics, partialTick);
             events.post(new Render2DEvent(graphics, partialTick));
         });
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> events.post(new Render3DEvent(context.matrices(),
-                context.consumers(), Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false))));
+        WorldRenderEvents.BEFORE_ENTITIES.register(context -> events.post(new Render3DEvent(context.matrices(),
+                context.commandQueue(), Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false))));
         AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
             // display-only: observe the local player's own attacks, never alter or cancel them
             if (level.isClientSide()) events.post(new AttackEntityEvent(entity));
             return InteractionResult.PASS;
         });
+    }
+
+    private static void registerCosmetics() {
+        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(CosmeticRegistry.RELOADER_ID, cosmetics.registry());
+        LivingEntityFeatureRendererRegistrationCallback.EVENT.register((type, renderer, helper, context) -> {
+            if (renderer instanceof AvatarRenderer<?> avatar) helper.register(new CosmeticLayer(avatar, context.getModelSet()));
+        });
+        events.subscribe(TickEvent.class, e -> cosmetics.effects().tick());
+        events.subscribe(AttackEntityEvent.class, e -> cosmetics.effects().onAttack(e.target()));
+        events.subscribe(Render3DEvent.class, e -> cosmetics.effects().render(e.poseStack(), e.submitter(), e.partialTick()));
     }
 
     public static EventBus events() {
@@ -155,6 +177,10 @@ public final class ArchangelClient implements ClientModInitializer {
 
     public static ClickCounter clicks() {
         return clicks;
+    }
+
+    public static CosmeticManager cosmetics() {
+        return cosmetics;
     }
 
     public static ConfigManager config() {

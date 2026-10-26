@@ -1,0 +1,129 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.archangel.seraph_wings",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 4,
+        "visible_bounds_height": 4,
+        "visible_bounds_offset": [
+          0,
+          1.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "wings",
+          "pivot": [
+            0,
+            24,
+            0
+          ]
+        },
+        {
+          "name": "left_wing",
+          "parent": "wings",
+          "pivot": [
+            1.5,
+            22,
+            2.5
+          ],
+          "rotation": [
+            0,
+            -28,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                1,
+                7,
+                2.5
+              ],
+              "size": [
+                20,
+                24,
+                0
+              ],
+              "uv": [
+                0,
+                0
+              ],
+              "mirror": false
+            },
+            {
+              "origin": [
+                1,
+                17,
+                2.2
+              ],
+              "size": [
+                14,
+                14,
+                0
+              ],
+              "uv": [
+                0,
+                32
+              ],
+              "mirror": false
+            }
+          ]
+        },
+        {
+          "name": "right_wing",
+          "parent": "wings",
+          "pivot": [
+            -1.5,
+            22,
+            2.5
+          ],
+          "rotation": [
+            0,
+            28,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -21,
+                7,
+                2.5
+              ],
+              "size": [
+                20,
+                24,
+                0
+              ],
+              "uv": [
+                0,
+                0
+              ],
+              "mirror": true
+            },
+            {
+              "origin": [
+                -15,
+                17,
+                2.2
+              ],
+              "size": [
+                14,
+                14,
+                0
+              ],
+              "uv": [
+                0,
+                32
+              ],
+              "mirror": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

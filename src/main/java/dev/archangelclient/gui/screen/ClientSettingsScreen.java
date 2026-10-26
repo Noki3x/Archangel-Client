@@ -5,6 +5,7 @@ import dev.archangelclient.core.config.ConfigManager;
 import dev.archangelclient.core.module.Category;
 import dev.archangelclient.core.module.Module;
 import dev.archangelclient.core.setting.Setting;
+import dev.archangelclient.core.setting.StringSetting;
 import dev.archangelclient.gui.render.Colors;
 import dev.archangelclient.gui.render.MenuBackground;
 import dev.archangelclient.gui.render.RenderUtil;
@@ -155,6 +156,10 @@ public class ClientSettingsScreen extends FadingScreen {
             TextButton edit = new TextButton("Edit HUD Layout", TextButton.Style.ACCENT, () -> minecraft.setScreen(new HudEditorScreen(this)));
             chrome.add(new HeaderWidget(edit).setBounds(search.getX() - edit.preferredWidth() - Theme.GAP, py + 11, edit.preferredWidth(), 16));
         }
+        if (category == Category.COSMETICS && search.getText().isBlank()) {
+            TextButton open = new TextButton("Open Locker", TextButton.Style.ACCENT, () -> minecraft.setScreen(new CosmeticsScreen(this)));
+            chrome.add(new HeaderWidget(open).setBounds(search.getX() - open.preferredWidth() - Theme.GAP, py + 11, open.preferredWidth(), 16));
+        }
         List<Module> modules = search.getText().isBlank()
                 ? ArchangelClient.modules().byCategory(category)
                 : ArchangelClient.modules().search(search.getText());
@@ -173,7 +178,10 @@ public class ClientSettingsScreen extends FadingScreen {
                 .setBounds(cx, py + 11, 40, 16));
         chrome.add(new HeaderWidget(new Toggle(m::isEnabled, m::toggle))
                 .setBounds(cx + cw - Toggle.WIDTH, py + 13, Toggle.WIDTH, Toggle.HEIGHT));
-        for (Setting<?> s : m.getSettings()) content.add(SettingWidget.of(s));
+        for (Setting<?> s : m.getSettings()) {
+            if (s instanceof StringSetting) continue; // stored-only values, edited from their own screens
+            content.add(SettingWidget.of(s));
+        }
         content.add(SettingWidget.of(m.getKeybind()));
         content.add(new TextButton("Reset to defaults", TextButton.Style.NORMAL, () -> {
             m.getSettings().forEach(Setting::reset);

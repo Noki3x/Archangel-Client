@@ -1,0 +1,83 @@
+{
+  "cosmetics": [
+    {
+      "id": "cape_archangel", "type": "cape", "name": "Archangel Cape", "rarity": "epic",
+      "description": "Midnight blue to violet, with the glowing Archangel wings.",
+      "texture": "cape/archangel", "glow": true
+    },
+    {
+      "id": "cape_midnight", "type": "cape", "name": "Midnight Cape", "rarity": "rare",
+      "description": "A quiet night sky with a crescent moon and glowing stars.",
+      "texture": "cape/midnight", "glow": true
+    },
+    {
+      "id": "cape_nebula", "type": "cape", "name": "Nebula Cape", "rarity": "legendary",
+      "description": "Animated: a drifting nebula with twinkling stars.",
+      "texture": "cape/nebula", "frames": 8, "frameTicks": 3, "glow": true
+    },
+    {
+      "id": "wings_seraph", "type": "wings", "name": "Seraph Wings", "rarity": "legendary",
+      "description": "Luminous white feathers edged in blue. They flap as you move.",
+      "model": "seraph_wings", "attach": "body", "texture": "wings/seraph", "glow": true, "emissive": true,
+      "anim": { "flapSpeed": 0.09, "flapAngle": 9 }
+    },
+    {
+      "id": "wings_void", "type": "wings", "name": "Void Wings", "rarity": "epic",
+      "description": "Dark violet wings with a purple glow.",
+      "model": "seraph_wings", "attach": "body", "texture": "wings/void", "glow": true, "emissive": true,
+      "anim": { "flapSpeed": 0.08, "flapAngle": 8 }
+    },
+    {
+      "id": "halo_seraph", "type": "halo", "name": "Seraph Halo", "rarity": "rare",
+      "description": "A floating ring of white light.",
+      "model": "halo", "attach": "head", "texture": "halo/seraph", "glow": true, "emissive": true, "colors": ["#E0F2FE", "#93C5FD"],
+      "anim": { "spin": 1.2, "bob": 0.6 }
+    },
+    {
+      "id": "halo_nebula", "type": "halo", "name": "Nebula Halo", "rarity": "epic",
+      "description": "A violet halo that spins a little faster.",
+      "model": "halo", "attach": "head", "texture": "halo/nebula", "glow": true, "emissive": true, "colors": ["#C4B5FD", "#3B82F6"],
+      "anim": { "spin": 2.4, "bob": 0.6 }
+    },
+    {
+      "id": "hat_crown", "type": "hat", "name": "Crown", "rarity": "epic",
+      "description": "Gold, with a single blue gem.",
+      "model": "crown", "attach": "head", "texture": "hat/crown", "colors": ["#F5C46B", "#3B82F6"]
+    },
+    {
+      "id": "hat_top_hat", "type": "hat", "name": "Top Hat", "rarity": "common",
+      "description": "Classic black with an Archangel blue band.",
+      "model": "top_hat", "attach": "head", "texture": "hat/top_hat", "colors": ["#25272F", "#3B82F6"]
+    },
+    {
+      "id": "aura_archangel", "type": "aura", "name": "Archangel Aura", "rarity": "legendary",
+      "description": "Blue and violet glow, holographic afterimages and a ring of light. Visible on you only.",
+      "texture": "aura/swirl", "colors": ["#3B82F6", "#8B5CF6"]
+    },
+    {
+      "id": "aura_frost", "type": "aura", "name": "Frost Aura", "rarity": "epic",
+      "description": "An icy cyan and white glow. Visible on you only.",
+      "texture": "aura/swirl", "colors": ["#67E8F9", "#E0F2FE"]
+    },
+    {
+      "id": "trail_light", "type": "trail", "name": "Arc of Light", "rarity": "rare",
+      "description": "Your swings leave a blue arc of light.",
+      "colors": ["#60A5FA", "#3B82F6"]
+    },
+    {
+      "id": "trail_nebula", "type": "trail", "name": "Nebula Arc", "rarity": "epic",
+      "description": "A violet-to-blue swing arc.",
+      "colors": ["#A78BFA", "#3B82F6"]
+    },
+    {
+      "id": "hit_blue_sparks", "type": "hit_effect", "name": "Blue Sparks", "rarity": "rare",
+      "description": "Blue sparks burst from your hits.",
+      "colors": ["#60A5FA", "#3B82F6"]
+    },
+    {
+      "id": "hit_violet_sparks", "type": "hit_effect", "name": "Violet Sparks", "rarity": "epic",
+      "description": "Violet and blue sparks burst from your hits.",
+      "colors": ["#C084FC", "#60A5FA"]
+    }
+  ]
+}

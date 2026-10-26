@@ -63,8 +63,8 @@ public final class Theme {
     public static final int LOGO_SIZE = 56;
     public static final int LOGO_MIN_SIZE = 28;
     public static final int TITLE_GAP = 6;
-    public static final int PREVIEW_WIDTH = 90;
-    public static final int PREVIEW_HEIGHT = 160;
+    public static final int PREVIEW_WIDTH = 140;
+    public static final int PREVIEW_HEIGHT = 170;
     public static final int CORNER_MARGIN = 6;
     public static final float MENU_COLUMN_X = 0.35f;
     public static final float PREVIEW_COLUMN_X = 0.75f;

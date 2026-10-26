@@ -1,5 +1,18 @@
 # Status
 
+## Milestone 10: done (2026-10-26)
+Polish. Build passes; checked on the title screen, in the Locker and in a world (screenshots:
+docs/screenshots/m10-*.png).
+
+- 3D preview (title screen and Locker): spins slowly after 2.5 s without dragging, easing in, and
+  the head turns to look at the cursor within neck limits while the body turns.
+- Screens now fade out as well as in (`FadingScreen#fadeOutThen`, `#veil`): client settings, the
+  Locker and the HUD editor. List rows (profiles, shader packs) animate their hover.
+- Menu light rays are one smooth generated texture per ray instead of stepped segments, which
+  removes the faint diamond banding noted in milestone 1.
+- README.md: build, run, system properties, backend setup, project layout, how to add a module /
+  HUD element / cosmetic / emote, and the placeholder assets to replace.
+
 ## Milestone 9: done (2026-10-26)
 Backend in `backend/` (see backend/README.md): Node + TypeScript, Fastify 5, Prisma 7 on
 SQLite, a WebSocket hub, zod validation, rate limiting, `.env.example`. `npm test` runs 20 API and
@@ -213,12 +226,11 @@ Changes made in the build session:
 - Light beams reworked into a fan of soft rays from the top-right, as in reference 1.
 - Logo shrinks on short windows so the menu column never overlaps the version text.
 
-Known gaps, scheduled for later milestones:
-- Skin preview supports drag-to-rotate (vanilla widget); idle spin + mouse follow is milestone 10.
-- Rotated beam segments show faint diamond banding at their ends; revisit in milestone 10 polish.
+Known gaps from this milestone (smooth beams and the preview's idle spin/mouse follow) were closed in milestone 10.
 
 ## Running locally
 `./gradlew runClient` (add `--args="--width 1700 --height 950"` for a bigger window).
 In the cloud: `Xvfb :99 &` then `DISPLAY=:99 ./gradlew runClient`.
 
-## Next: milestone 10 (polish + README)
+## Next
+All ten milestones are done. Placeholder art to replace is listed in README.md.

@@ -23,8 +23,8 @@ import org.joml.Vector3f;
 /**
  * Full 3D preview of the signed-in player wearing a loadout, drawn through the real player
  * renderer (so it shows exactly what the world shows, cosmetic layer included). Works on the title
- * screen too: the render state is built by hand, no player entity is needed. Drag to rotate; the
- * idle spin and mouse-follow arrive with the polish pass in milestone 10.
+ * screen too: the render state is built by hand, no player entity is needed. Drag to rotate and
+ * tilt; left alone it slowly spins, and the head always turns to look at the cursor.
  */
 public class CosmeticPreview extends UiWidget {
     private static final float DRAG_SENSITIVITY = 2.5f;
@@ -36,6 +36,9 @@ public class CosmeticPreview extends UiWidget {
     private Loadout loadout = Loadout.EMPTY;
     private float rotation = -25f;
     private float pitch = -5f;
+    private float headYaw, headPitch;
+    private long lastFrameMs = -1;
+    private long lastDragMs;
     private boolean dragging;
     private double lastMouseX, lastMouseY;
     private boolean demoSwing;
@@ -84,9 +87,10 @@ public class CosmeticPreview extends UiWidget {
         state.skin = skin.get();
         state.entityType = EntityType.PLAYER;
         state.ageInTicks = (now % 1_000_000L) / 50f;
+        animate(now, mouseX, mouseY, x0, y0);
         state.bodyRot = 180f + rotation;
-        state.yRot = 0;
-        state.xRot = pitch;
+        state.yRot = headYaw;
+        state.xRot = headPitch;
         state.lightCoords = 0xF000F0;
         state.boundingBoxHeight = 1.8f;
         state.boundingBoxWidth = 0.6f;
@@ -109,6 +113,28 @@ public class CosmeticPreview extends UiWidget {
         g.submitEntityRenderState(state, scale, translation, view, tilt, x0, y0, x0 + width, y0 + height);
     }
 
+    /** Idle spin after a pause in dragging, and the head easing toward the cursor. */
+    private void animate(long now, int mouseX, int mouseY, int x0, int y0) {
+        float dt = lastFrameMs < 0 ? 0 : Math.min(0.1f, (now - lastFrameMs) / 1000f);
+        lastFrameMs = now;
+        long idle = now - lastDragMs - Theme.PREVIEW_IDLE_DELAY_MS;
+        if (!dragging && idle > 0) {
+            float ramp = Math.min(1f, idle / (float) Theme.PREVIEW_SPIN_RAMP_MS);
+            rotation = Mth.wrapDegrees(rotation + Theme.PREVIEW_SPIN_DEG_PER_SEC * ramp * dt);
+        }
+
+        // The head looks at the cursor in screen space, so it has to undo the body's turn. The neck
+        // only turns so far: once the body faces away, the head settles at its limit.
+        int headX = x0 + width / 2, headY = y0 + height / 5;
+        float toCursorYaw = (float) Math.toDegrees(Math.atan((mouseX - headX) / Theme.PREVIEW_FOLLOW_RANGE));
+        float toCursorPitch = (float) Math.toDegrees(Math.atan((mouseY - headY) / Theme.PREVIEW_FOLLOW_RANGE));
+        float targetYaw = Mth.clamp(Mth.wrapDegrees(-toCursorYaw - rotation), -Theme.PREVIEW_HEAD_MAX_YAW, Theme.PREVIEW_HEAD_MAX_YAW);
+        float targetPitch = Mth.clamp(toCursorPitch, -Theme.PREVIEW_HEAD_MAX_PITCH, Theme.PREVIEW_HEAD_MAX_PITCH);
+        float k = 1f - (float) Math.exp(-Theme.PREVIEW_FOLLOW_RATE * dt);
+        headYaw += (targetYaw - headYaw) * k;
+        headPitch += (targetPitch - headPitch) * k;
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button != 0 || !isHovered(mouseX, mouseY)) return false;
@@ -125,6 +151,7 @@ public class CosmeticPreview extends UiWidget {
         pitch = Mth.clamp(pitch - (float) (mouseY - lastMouseY) * DRAG_SENSITIVITY * 0.5f, -30f, 30f);
         lastMouseX = mouseX;
         lastMouseY = mouseY;
+        lastDragMs = Util.getMillis();
         return true;
     }
 
@@ -132,6 +159,7 @@ public class CosmeticPreview extends UiWidget {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         boolean was = dragging;
         dragging = false;
+        if (was) lastDragMs = Util.getMillis();
         return was;
     }
 }

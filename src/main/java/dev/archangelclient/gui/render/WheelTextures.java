@@ -11,7 +11,8 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.Identifier;
 
 /**
- * Anti-aliased white shapes for radial menus, generated once per slot count: one ring wedge per
+ * Anti-aliased white shapes generated at runtime: the menu backdrop's light ray, and for radial
+ * menus (once per slot count) one ring wedge per
  * slot (each covering the whole wheel area, so they all draw into the same square) and a disc.
  * Tint them when drawing. Linear filtering keeps edges smooth at any GUI scale.
  */
@@ -25,6 +26,9 @@ public final class WheelTextures {
     private static final List<Identifier> wedges = new ArrayList<>();
     private static Identifier disc;
     private static Identifier glow;
+    private static Identifier beam;
+    private static final int BEAM_TEX_WIDTH = 128;
+    private static final int BEAM_TEX_LENGTH = 512;
 
     private WheelTextures() {}
 
@@ -49,6 +53,38 @@ public final class WheelTextures {
             Minecraft.getInstance().getTextureManager().register(glow, texture("wheel glow", glowImage()));
         }
         return glow;
+    }
+
+    /**
+     * One menu light ray, pointing down from its origin at the top center: it widens to the full
+     * texture width at the far end and fades out along its length and toward its edges. Drawn as a
+     * single smooth quad, so there are no steps between segments.
+     */
+    public static Identifier beam() {
+        if (beam == null) {
+            beam = ArchangelClient.id("dynamic/menu_beam");
+            Minecraft.getInstance().getTextureManager().register(beam, texture("menu beam", beamImage()));
+        }
+        return beam;
+    }
+
+    /** Width at the origin relative to the far end, as the old segmented rays had it. */
+    public static final float BEAM_START_WIDTH = 1f / 3.5f;
+
+    private static NativeImage beamImage() {
+        NativeImage image = new NativeImage(BEAM_TEX_WIDTH, BEAM_TEX_LENGTH, true);
+        float c = BEAM_TEX_WIDTH / 2f;
+        for (int y = 0; y < BEAM_TEX_LENGTH; y++) {
+            float v = (y + 0.5f) / BEAM_TEX_LENGTH;
+            float halfWidth = BEAM_START_WIDTH + (1 - BEAM_START_WIDTH) * v;
+            for (int x = 0; x < BEAM_TEX_WIDTH; x++) {
+                float u = Math.abs(x + 0.5f - c) / c;
+                float across = clamp(1 - u / halfWidth);
+                float a = across * across * (3 - 2 * across) * (1 - v);
+                image.setPixel(x, y, ((int) (a * 255) << 24) | 0xFFFFFF);
+            }
+        }
+        return image;
     }
 
     private static void ensure(int count) {

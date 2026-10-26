@@ -350,6 +350,7 @@ public class ClientSettingsScreen extends FadingScreen {
 
         renderEmptyState(g);
         renderStatus(g);
+        veil(g, px, py, pw, ph);
         g.pose().popMatrix();
     }
 
@@ -476,7 +477,7 @@ public class ClientSettingsScreen extends FadingScreen {
     public void onClose() {
         KeybindButton.stopListening();
         ArchangelClient.config().save();
-        minecraft.setScreen(parent);
+        fadeOutThen(() -> minecraft.setScreen(parent));
     }
 
     @Override
@@ -568,6 +569,7 @@ public class ClientSettingsScreen extends FadingScreen {
 
     /** One selectable entry (a shader pack): name, optional detail, and "Active" or a Use button. */
     private static final class ChoiceRow extends UiWidget {
+        private final Animation hover = new Animation(Theme.HOVER_MS, 0f);
         private final String name;
         private final String detail;
         private final boolean active;
@@ -582,7 +584,8 @@ public class ClientSettingsScreen extends FadingScreen {
 
         @Override
         public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-            RenderUtil.roundedRect(g, x, y, width, height, Theme.RADIUS, isHovered(mouseX, mouseY) ? Theme.CARD_HOVER : Theme.CARD);
+            hover.target(isHovered(mouseX, mouseY) ? 1f : 0f);
+            RenderUtil.roundedRect(g, x, y, width, height, Theme.RADIUS, Colors.lerp(Theme.CARD, Theme.CARD_HOVER, hover.get()));
             int textW = width - 80;
             if (detail == null) {
                 Fonts.draw(g, Fonts.trim(name, textW), x + 9, y + 7, Theme.TEXT);
@@ -610,6 +613,7 @@ public class ClientSettingsScreen extends FadingScreen {
 
     /** One saved profile: name, an "Active" badge or Load button, and Delete. */
     private final class ProfileRow extends UiWidget {
+        private final Animation hover = new Animation(Theme.HOVER_MS, 0f);
         private final String name;
         private final TextButton load;
         private final TextButton delete;
@@ -634,7 +638,8 @@ public class ClientSettingsScreen extends FadingScreen {
 
         @Override
         public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-            RenderUtil.roundedRect(g, x, y, width, height, Theme.RADIUS, isHovered(mouseX, mouseY) ? Theme.CARD_HOVER : Theme.CARD);
+            hover.target(isHovered(mouseX, mouseY) ? 1f : 0f);
+            RenderUtil.roundedRect(g, x, y, width, height, Theme.RADIUS, Colors.lerp(Theme.CARD, Theme.CARD_HOVER, hover.get()));
             Fonts.draw(g, Fonts.trim(name, width - 140), x + 9, y + 7, Theme.TEXT);
             if (isActive()) {
                 int bw = Fonts.width("Active") + 12;

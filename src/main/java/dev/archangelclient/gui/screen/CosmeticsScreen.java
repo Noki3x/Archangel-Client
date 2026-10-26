@@ -169,6 +169,7 @@ public class CosmeticsScreen extends FadingScreen {
         if (grid.children().isEmpty()) {
             Fonts.drawCentered(g, "No " + tab.plural().toLowerCase() + " yet", gx + gw / 2, py + ph / 2, Theme.TEXT_MUTED);
         }
+        veil(g, px + previewW, py, pw - previewW, ph);
         g.pose().popMatrix();
 
         preview.setLoadout(previewLoadout());
@@ -222,7 +223,7 @@ public class CosmeticsScreen extends FadingScreen {
     @Override
     public void onClose() {
         ArchangelClient.config().save();
-        minecraft.setScreen(parent);
+        fadeOutThen(() -> minecraft.setScreen(parent));
     }
 
     /** Pill tab for one slot; the active one is filled with the accent color. */

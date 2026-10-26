@@ -228,7 +228,7 @@ public class HudEditorScreen extends FadingScreen {
     @Override
     public void onClose() {
         ArchangelClient.config().save();
-        minecraft.setScreen(parent);
+        fadeOutThen(() -> minecraft.setScreen(parent));
     }
 
     @Override

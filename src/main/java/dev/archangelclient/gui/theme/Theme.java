@@ -56,6 +56,7 @@ public final class Theme {
     // Animation timings (milliseconds)
     public static final long HOVER_MS = 150;
     public static final long SCREEN_FADE_MS = 300;
+    public static final long SCREEN_FADE_OUT_MS = 140;
     public static final long BEAM_CYCLE_MS = 14_000;
 
     // Title screen layout (GUI pixels)
@@ -72,9 +73,22 @@ public final class Theme {
     public static final float MENU_COLUMN_X = 0.35f;
     public static final float PREVIEW_COLUMN_X = 0.75f;
 
+    // 3D player preview (title screen, Locker)
+    /** Idle spin starts this long after the last drag. */
+    public static final long PREVIEW_IDLE_DELAY_MS = 2500;
+    public static final float PREVIEW_SPIN_DEG_PER_SEC = 18f;
+    /** Spin eases in over this long instead of starting at full speed. */
+    public static final long PREVIEW_SPIN_RAMP_MS = 1200;
+    /** How far the head turns and tilts toward the cursor (degrees). */
+    public static final float PREVIEW_HEAD_MAX_YAW = 50f;
+    public static final float PREVIEW_HEAD_MAX_PITCH = 30f;
+    /** Cursor distance (GUI pixels) that maps to about 45 degrees of head turn. */
+    public static final float PREVIEW_FOLLOW_RANGE = 60f;
+    /** Head smoothing rate (per second): higher snaps faster to the cursor. */
+    public static final float PREVIEW_FOLLOW_RATE = 8f;
+
     // Light beams (fan of rays from above the top-right corner)
     public static final int BEAM_COUNT = 6;
-    public static final int BEAM_SEGMENTS = 14;
     public static final float BEAM_ORIGIN_X = 0.85f;
     public static final float BEAM_ANGLE_RAD = 0.55f;
     public static final float BEAM_FAN_RAD = 0.9f;

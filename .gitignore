@@ -7,3 +7,6 @@ run/
 backend/node_modules/
 backend/dist/
 backend/.env
+backend/src/generated/
+backend/data/
+run2/

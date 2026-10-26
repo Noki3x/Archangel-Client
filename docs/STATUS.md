@@ -1,5 +1,26 @@
 # Status
 
+## Milestone 9: done (2026-10-26)
+Backend in `backend/` (see backend/README.md): Node + TypeScript, Fastify 5, Prisma 7 on
+SQLite, a WebSocket hub, zod validation, rate limiting, `.env.example`. `npm test` runs 20 API and
+WebSocket tests; `./gradlew build` passes. Tested end to end with two clients on a local offline
+server against the real backend (screenshots: docs/screenshots/m9-*.png).
+
+- REST: `POST /auth` (Mojang hasJoined -> JWT, single-use serverId), `GET /users/:uuid`,
+  `GET /me`, `PUT /me/cosmetics`, `PUT /me/profile`, `GET /health`. Inputs follow the client's own
+  rules; players can't set their own badge.
+- WebSocket `/ws`: rooms per server address; presence, emote relay and `profile_update` pushes.
+  Identity comes from the token, never from what the hello claims. Message size, hello timeout,
+  emote token bucket, strike limit and duplicate-connection handling.
+- Client: `net/BackendSession` signs in with Mojang's joinServer (your access token only goes to
+  Mojang) once you're in a world, renews before expiry, and sends the token in the socket hello.
+  Your loadout is uploaded after sign-in and whenever it changes (debounced; includes switching
+  config profiles). Other players see the change live through `profile_update`.
+- Offline still works fully: no backend means no sign-in, nothing retried more than every few
+  minutes, and your own cosmetics keep rendering from the local profile.
+- Dev testing: backend `ALLOW_UNVERIFIED=true` plus client `-Darchangel.devAuth=true
+  -Darchangel.allowOfflineUuids=true` lets offline dev accounts sign in through `POST /auth/dev`.
+
 ## Milestone 8: done (2026-10-26)
 Shaders and visuals. Build passes; tested in a world by day and night, and with real Iris 1.10.8
 + Sodium 0.8.15 and a shader pack installed in the dev run folder (not shipped, not a dependency)
@@ -200,4 +221,4 @@ Known gaps, scheduled for later milestones:
 `./gradlew runClient` (add `--args="--width 1700 --height 950"` for a bigger window).
 In the cloud: `Xvfb :99 &` then `DISPLAY=:99 ./gradlew runClient`.
 
-## Next: milestone 9 (backend)
+## Next: milestone 10 (polish + README)

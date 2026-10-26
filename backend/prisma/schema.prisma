@@ -1,0 +1,29 @@
+// Archangel backend database. SQLite by default; the URL comes from DATABASE_URL (see prisma.config.ts).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+/// One Minecraft account that has signed in with Archangel at least once (via POST /auth).
+model User {
+  /// Mojang profile UUID, lowercase with dashes.
+  uuid        String   @id
+  /// Minecraft account name as Mojang last reported it.
+  name        String
+  /// Optional display name shown on nametags instead of the account name.
+  displayName String?
+  /// Optional nametag color, "#RRGGBB".
+  nameColor   String?
+  /// Badge shown next to the nametag; the client currently draws "archangel".
+  badge       String   @default("archangel")
+  /// Equipped cosmetics as JSON, {"cape": "cape_nebula", ...}. Stored as text so any SQL backend works.
+  cosmetics   String   @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastSeenAt  DateTime @default(now())
+}

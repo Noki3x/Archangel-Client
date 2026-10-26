@@ -5,7 +5,9 @@ import dev.archangelclient.core.module.Module;
 import dev.archangelclient.core.setting.BooleanSetting;
 import dev.archangelclient.core.setting.NumberSetting;
 import dev.archangelclient.core.setting.StringSetting;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +39,7 @@ public class CosmeticsModule extends Module {
             "Sparks per hit with a hit effect equipped", 14, 4, 30, 1));
 
     private final Map<CosmeticType, StringSetting> slots = new EnumMap<>(CosmeticType.class);
+    private final List<Runnable> loadoutListeners = new ArrayList<>();
     private Loadout loadout;
 
     public CosmeticsModule() {
@@ -44,7 +47,10 @@ public class CosmeticsModule extends Module {
         for (CosmeticType type : CosmeticType.values()) {
             StringSetting slot = add(new StringSetting("equipped_" + type.key(), "", "", 64));
             slot.visibleWhen(() -> false);
-            slot.onChange(() -> loadout = null);
+            slot.onChange(() -> {
+                loadout = null;
+                loadoutListeners.forEach(Runnable::run);
+            });
             slots.put(type, slot);
         }
     }
@@ -58,6 +64,11 @@ public class CosmeticsModule extends Module {
             loadout = l = Loadout.of(map);
         }
         return l;
+    }
+
+    /** Called whenever anything is equipped or removed, including by switching config profiles. */
+    public void onLoadoutChange(Runnable listener) {
+        loadoutListeners.add(listener);
     }
 
     public void equip(CosmeticType type, String id) {

@@ -46,6 +46,7 @@ import dev.archangelclient.shader.PostEffectsModule;
 import dev.archangelclient.sky.NebulaSkyModule;
 import dev.archangelclient.visual.BrightnessModule;
 import dev.archangelclient.performance.FpsBoostModule;
+import dev.archangelclient.net.BackendSession;
 import dev.archangelclient.net.BackendSocket;
 import dev.archangelclient.net.ProfileCache;
 import dev.archangelclient.net.UserApi;
@@ -92,6 +93,7 @@ public final class ArchangelClient implements ClientModInitializer {
     private static EmoteManager emotes;
     private static BackendSocket backend;
     private static ProfileCache profiles;
+    private static BackendSession session;
     private static KeyMapping emoteWheelKey;
     private static KeyMapping openSettingsKey;
     private static KeyMapping openHudEditorKey;
@@ -110,6 +112,7 @@ public final class ArchangelClient implements ClientModInitializer {
         emotes = new EmoteManager();
         backend = new BackendSocket();
         profiles = new ProfileCache(new UserApi());
+        session = new BackendSession(new UserApi(), () -> modules.get(CosmeticsModule.class).loadout());
         backend.on("profile_update", m -> {
             // a player changed their cosmetics or name: refetch on next sight
             try {
@@ -194,6 +197,7 @@ public final class ArchangelClient implements ClientModInitializer {
     }
 
     private static void registerCosmetics() {
+        modules.get(CosmeticsModule.class).onLoadoutChange(session::loadoutChanged); // keep the backend's copy current
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(CosmeticRegistry.RELOADER_ID, cosmetics.registry());
         LivingEntityFeatureRendererRegistrationCallback.EVENT.register((type, renderer, helper, context) -> {
             if (renderer instanceof AvatarRenderer<?> avatar) helper.register(new CosmeticLayer(avatar, context.getModelSet()));
@@ -221,6 +225,8 @@ public final class ArchangelClient implements ClientModInitializer {
     private static JsonObject hello(Minecraft client) {
         JsonObject m = new JsonObject();
         m.addProperty("type", "hello");
+        String token = session.tokenBlocking(); // hello is built on the socket's thread, never the render thread
+        if (token != null) m.addProperty("token", token);
         m.addProperty("uuid", client.getUser().getProfileId().toString());
         m.addProperty("name", client.getUser().getName());
         var server = client.getCurrentServer();
@@ -258,6 +264,10 @@ public final class ArchangelClient implements ClientModInitializer {
 
     public static ProfileCache profiles() {
         return profiles;
+    }
+
+    public static BackendSession session() {
+        return session;
     }
 
     public static BackendSocket backend() {
